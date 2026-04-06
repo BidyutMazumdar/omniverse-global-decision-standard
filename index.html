@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>OMNIVERSE™ — Global Decision Intelligence Standard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background: #0b0f1a;
+    color: #ffffff;
+}
+
+/* NAVBAR */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 40px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 120px 20px;
+}
+
+.hero h1 {
+    font-size: 64px;
+}
+
+.hero p {
+    color: #aaa;
+    max-width: 700px;
+    margin: auto;
+}
+
+/* BUTTON */
+.btn {
+    display: inline-block;
+    padding: 14px 26px;
+    margin: 10px;
+    border-radius: 10px;
+    background: linear-gradient(135deg,#4da6ff,#7f5cff);
+    color: white;
+    font-weight: bold;
+}
+
+/* SECTIONS */
+.section {
+    max-width: 1100px;
+    margin: auto;
+    padding: 80px 20px;
+}
+
+.card {
+    background: #121826;
+    padding: 30px;
+    border-radius: 16px;
+    margin-top: 20px;
+}
+
+/* FADE ANIMATION */
+.fade {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 1s;
+}
+
+.fade.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<div class="nav">
+    <div><b>OMNIVERSE™</b></div>
+    <div>
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Papers</a>
+    </div>
+</div>
+
+<!-- HERO -->
+<div class="hero fade">
+    <h1>OMNIVERSE™</h1>
+    <p>
+    Global Decision Sovereignty & Strategic Intelligence Standard
+    </p>
+
+    <a class="btn" href="https://doi.org/10.5281/zenodo.19430636">View DOI</a>
+</div>
+
+<!-- ABOUT -->
+<div class="section fade">
+    <div class="card">
+        <b>Author:</b><br><br>
+        Dr. B. Mazumdar<br>
+        Architect of Modern Statehood<br><br>
+
+        ORCID:<br>
+        https://orcid.org/0009-0007-5615-3558
+    </div>
+</div>
+
+<!-- ABSTRACT -->
+<div class="section fade">
+    <div class="card">
+        OMNIVERSE™ defines a mathematically formalized, sovereign-neutral global standard 
+        for decision intelligence integrating governance, AI alignment, and multi-agent systems.
+    </div>
+</div>
+
+<!-- ARCHITECTURE -->
+<div class="section fade">
+    <div class="card">
+        OMNIVERSE™ → O.M.N.I.A.R.C.H™ → AEON™<br><br>
+        Architecture layer implemented via O.M.N.I.A.R.C.H™<br>
+        Execution layer powered by AEON™
+    </div>
+</div>
+
+<!-- MATH -->
+<div class="section fade">
+    <div class="card">
+        <b>D = f(I, A, R, C, T)</b><br><br>
+        <b>Ds = (I × A × C) / (R × σt)</b><br><br>
+        <b>Cs = Io × Rs × AGAPn × e^(−σt)</b><br><br>
+        <b>Ad = (Cs × Co × Io × Rs) × e^(−σt)</b>
+    </div>
+</div>
+
+<!-- ACCESS -->
+<div class="section fade">
+    <div class="card">
+        <a class="btn" href="https://doi.org/10.5281/zenodo.19430636">DOI</a>
+        <a class="btn" href="https://github.com/BidyutMazumdar/omniverse-global-decision-standard">GitHub</a>
+    </div>
+</div>
+
+<!-- LICENSE -->
+<div class="section fade">
+    <div class="card">
+        OMNIVERSE™ Proprietary License<br>
+        Commercial use prohibited without authorization
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div class="section">
+    <p style="text-align:center; color:#777;">
+    © 2026 Dr. B. Mazumdar — All Rights Reserved
+    </p>
+</div>
+
+<script>
+const elements = document.querySelectorAll(".fade");
+window.addEventListener("scroll", () => {
+    elements.forEach(el => {
+        const top = el.getBoundingClientRect().top;
+        if (top < window.innerHeight - 100) {
+            el.classList.add("show");
+        }
+    });
+});
+</script>
+
+</body>
+</html>
