@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>OMNIVERSE™ Simulator</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="nav">
+    <div><b>OMNIVERSE™</b></div>
+    <div>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="papers.html">Papers</a>
+        <a href="simulator.html">Simulator</a>
+        <a href="ai.html">AI Demo</a>
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="section fade">
+    <h1>Adoption Readiness Simulator</h1>
+</div>
+
+<!-- SLIDERS -->
+<div class="section fade">
+    <div class="card">
+
+        <label>Cs (Certification Score)</label>
+        <input type="range" min="0" max="1" step="0.01" id="Cs">
+
+        <label>Co (Compliance Score)</label>
+        <input type="range" min="0" max="1" step="0.01" id="Co">
+
+        <label>Io (Index Score)</label>
+        <input type="range" min="0" max="1" step="0.01" id="Io">
+
+        <label>Rs (Resilience Score)</label>
+        <input type="range" min="0" max="1" step="0.01" id="Rs">
+
+        <label>σt (Volatility)</label>
+        <input type="range" min="0" max="1" step="0.01" id="sigma">
+
+        <h2 id="result">Ad = 0.0000</h2>
+
+    </div>
+</div>
+
+<!-- GRAPH -->
+<div class="section fade">
+    <div class="card">
+        <canvas id="chart"></canvas>
+    </div>
+</div>
+
+<script src="script.js"></script>
+
+<script>
+
+// Initialize Chart
+const ctx = document.getElementById('chart').getContext('2d');
+
+let chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Ad vs σt',
+            data: [],
+            fill: false,
+            tension: 0.3
+        }]
+    }
+});
+
+// Calculation Function
+function calculateAd(Cs, Co, Io, Rs, sigma) {
+    return (Cs * Co * Io * Rs) * Math.exp(-sigma);
+}
+
+// Update System
+function update() {
+
+    let Cs = +document.getElementById("Cs").value;
+    let Co = +document.getElementById("Co").value;
+    let Io = +document.getElementById("Io").value;
+    let Rs = +document.getElementById("Rs").value;
+    let sigma = +document.getElementById("sigma").value;
+
+    let Ad = calculateAd(Cs, Co, Io, Rs, sigma);
+
+    // Update result
+    document.getElementById("result").innerText = "Ad = " + Ad.toFixed(4);
+
+    // Generate curve
+    let labels = [];
+    let data = [];
+
+    for (let s = 0; s <= 1; s += 0.05) {
+        labels.push(s.toFixed(2));
+        data.push(calculateAd(Cs, Co, Io, Rs, s));
+    }
+
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = data;
+    chart.update();
+}
+
+// Event Listeners
+document.querySelectorAll("input").forEach(el => {
+    el.addEventListener("input", update);
+});
+
+// Initial run
+window.onload = update;
+
+</script>
+
+</body>
+</html>
