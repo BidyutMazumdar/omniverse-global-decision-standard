@@ -1,0 +1,175 @@
+/* GLOBAL */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+    background: #0b0f1a;
+    color: white;
+    scroll-behavior: smooth;
+}
+
+/* NAVBAR */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 40px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 14px;
+    opacity: 0.85;
+    transition: 0.3s;
+}
+
+.nav a:hover {
+    opacity: 1;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 120px 20px;
+}
+
+.hero h1 {
+    font-size: 64px;
+    background: linear-gradient(90deg, #4da6ff, #7f5cff);
+    -webkit-background-clip: text;
+    color: transparent;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    color: #aaa;
+    max-width: 700px;
+    margin: auto;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+/* BUTTON */
+.btn {
+    margin-top: 30px;
+    padding: 14px 28px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4da6ff, #7f5cff);
+    color: white;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+/* SECTION */
+.section {
+    padding: 80px 20px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.section h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+/* CARD */
+.card {
+    background: #121826;
+    padding: 30px;
+    border-radius: 16px;
+    margin-top: 20px;
+    transition: 0.4s;
+    line-height: 1.6;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+}
+
+/* INPUT (for simulator & AI) */
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: none;
+    background: #1c2333;
+    color: white;
+}
+
+/* RANGE SLIDER */
+input[type=range] {
+    appearance: none;
+    height: 6px;
+    background: #2a3145;
+    border-radius: 10px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #4da6ff;
+    cursor: pointer;
+}
+
+/* BUTTON (AI page) */
+button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #4da6ff;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+/* RESULT TEXT */
+h3 {
+    margin-top: 20px;
+}
+
+/* ANIMATION */
+.fade {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 1s;
+}
+
+.fade.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* MOBILE RESPONSIVE */
+@media(max-width: 768px) {
+    .hero h1 {
+        font-size: 40px;
+    }
+
+    .nav {
+        padding: 15px 20px;
+    }
+
+    .section {
+        padding: 60px 15px;
+    }
+}
