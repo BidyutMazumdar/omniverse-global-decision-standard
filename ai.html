@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>OMNIVERSE™ AI Decision Engine</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="nav">
+    <div><b>OMNIVERSE™</b></div>
+    <div>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="papers.html">Papers</a>
+        <a href="simulator.html">Simulator</a>
+        <a href="ai.html">AI Demo</a>
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="section fade">
+    <h1>AI Decision Engine</h1>
+    <p>Strategic Evaluation Model for Risk, Stability & Execution Readiness</p>
+</div>
+
+<!-- INPUT -->
+<div class="section fade">
+    <div class="card">
+
+        <label>Risk Level (0 – 1)</label>
+        <input type="range" min="0" max="1" step="0.01" id="risk">
+
+        <label>Stability Index (0 – 1)</label>
+        <input type="range" min="0" max="1" step="0.01" id="stability">
+
+        <label>Execution Capacity (0 – 1)</label>
+        <input type="range" min="0" max="1" step="0.01" id="capacity">
+
+        <label>Governance Strength (0 – 1)</label>
+        <input type="range" min="0" max="1" step="0.01" id="governance">
+
+        <h2 id="score">Score: 0.000</h2>
+        <h3 id="decision">Decision: —</h3>
+
+    </div>
+</div>
+
+<!-- OUTPUT DETAILS -->
+<div class="section fade">
+    <div class="card">
+        <h3>System Interpretation</h3>
+        <p id="analysis">Awaiting input...</p>
+    </div>
+</div>
+
+<script src="script.js"></script>
+
+<script>
+
+// Decision Model
+function evaluate() {
+
+    let r = +document.getElementById("risk").value;
+    let s = +document.getElementById("stability").value;
+    let c = +document.getElementById("capacity").value;
+    let g = +document.getElementById("governance").value;
+
+    // Core Score Formula
+    let score = (s * c * g) * Math.exp(-r);
+
+    document.getElementById("score").innerText = "Score: " + score.toFixed(4);
+
+    let decision = "";
+    let analysis = "";
+
+    // Decision Logic
+    if (score > 0.75) {
+        decision = "High Confidence Approval";
+        analysis = "System exhibits strong stability, governance, and execution capacity with minimal risk exposure.";
+    } 
+    else if (score > 0.45) {
+        decision = "Conditional Approval";
+        analysis = "Moderate system readiness. Risk factors present but manageable with monitoring and adaptive control.";
+    } 
+    else {
+        decision = "High Risk — Rejection";
+        analysis = "Low system resilience or high volatility. Strategic deployment not recommended at this stage.";
+    }
+
+    document.getElementById("decision").innerText = "Decision: " + decision;
+    document.getElementById("analysis").innerText = analysis;
+}
+
+// Event listeners
+document.querySelectorAll("input").forEach(el => {
+    el.addEventListener("input", evaluate);
+});
+
+// Initial run
+window.onload = evaluate;
+
+</script>
+
+</body>
+</html>
