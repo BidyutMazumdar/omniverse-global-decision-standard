@@ -1,5 +1,5 @@
-// OMNIVERSE™ Global Script — 100% LOCK Edition
-// Production-safe, performance-aware, GitHub Pages compatible
+// OMNIVERSE™ Global Script — 100% LOCK FINAL Edition
+// Production-safe • Performance-optimized • Accessible • GitHub Pages compatible
 
 (() => {
   "use strict";
@@ -14,11 +14,13 @@
   // FADE / REVEAL SYSTEM
   // ==========================================
   function getFadeElements() {
-    return document.querySelectorAll(".fade");
+    return document.querySelectorAll(".fade:not(.show)");
   }
 
   function revealOnScroll() {
     const elements = getFadeElements();
+    if (!elements.length) return true;
+
     const windowHeight = window.innerHeight;
 
     elements.forEach((el) => {
@@ -28,11 +30,14 @@
         el.classList.add("show");
       }
     });
+
+    return getFadeElements().length === 0;
   }
 
   function revealAllImmediately() {
-    const elements = getFadeElements();
-    elements.forEach((el) => el.classList.add("show"));
+    document.querySelectorAll(".fade").forEach((el) => {
+      el.classList.add("show");
+    });
   }
 
   // ==========================================
@@ -45,7 +50,7 @@
       anchor.addEventListener("click", function (e) {
         const targetSelector = this.getAttribute("href");
 
-        // Ignore plain "#" links
+        // Ignore empty or plain "#" links
         if (!targetSelector || targetSelector === "#") return;
 
         const target = document.querySelector(targetSelector);
@@ -64,9 +69,13 @@
   // ==========================================
   // ACTIVE NAV LINK SYSTEM
   // ==========================================
-  function normalizePage(pathname) {
-    const page = pathname.split("/").pop() || "index.html";
-    return page === "" ? "index.html" : page;
+  function normalizePage(path) {
+    if (!path || path === "/" || path === "./") return "index.html";
+
+    const cleanPath = path.split("#")[0].split("?")[0];
+    const page = cleanPath.split("/").pop();
+
+    return !page ? "index.html" : page;
   }
 
   function initActiveNavLink() {
@@ -77,7 +86,11 @@
 
     links.forEach((link) => {
       const href = link.getAttribute("href");
-      if (href === currentPage) {
+      if (!href || href.startsWith("#")) return;
+
+      const normalizedHref = normalizePage(href);
+
+      if (normalizedHref === currentPage) {
         link.classList.add("active-link");
         link.setAttribute("aria-current", "page");
       }
@@ -88,15 +101,23 @@
   // THROTTLED SCROLL HANDLER
   // ==========================================
   let ticking = false;
+  let scrollBound = false;
 
   function onScroll() {
     if (prefersReducedMotion) return;
 
     if (!ticking) {
       window.requestAnimationFrame(() => {
-        revealOnScroll();
+        const done = revealOnScroll();
+
+        if (done && scrollBound) {
+          window.removeEventListener("scroll", onScroll);
+          scrollBound = false;
+        }
+
         ticking = false;
       });
+
       ticking = true;
     }
   }
@@ -110,11 +131,25 @@
 
     if (prefersReducedMotion) {
       revealAllImmediately();
-    } else {
-      revealOnScroll();
-      window.addEventListener("scroll", onScroll, { passive: true });
-      window.addEventListener("load", revealOnScroll);
+      return;
     }
+
+    const done = revealOnScroll();
+
+    if (!done) {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      scrollBound = true;
+    }
+
+    // Extra paint-safe pass after layout settles
+    window.requestAnimationFrame(() => {
+      const finished = revealOnScroll();
+
+      if (finished && scrollBound) {
+        window.removeEventListener("scroll", onScroll);
+        scrollBound = false;
+      }
+    });
   }
 
   document.addEventListener("DOMContentLoaded", init);
