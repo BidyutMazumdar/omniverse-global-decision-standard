@@ -1,145 +1,92 @@
-# OMNIVERSE™ — Global Decision Sovereignty & Strategic Intelligence Standard
+# 🌐 OMNIVERSE™  
+## Sovereign Decision Intelligence Standard  
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19430636.svg)](https://doi.org/10.5281/zenodo.19430636)
-![Status](https://img.shields.io/badge/status-live-success)
-![License](https://img.shields.io/badge/license-proprietary-red)
-
-DOI: https://doi.org/10.5281/zenodo.19430636  
-ORCID: https://orcid.org/0009-0007-5615-3558  
-
----
-
-## Author  
-
-Dr. B. Mazumdar, D.Sc. (Hon.), D.Litt. (Hon.)  
-Architect of Modern Statehood  
-Founder & Principal Architect, FAIR+D Canon™  
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19430636.svg)](https://doi.org/10.5281/zenodo.19430636)  
+![Status](https://img.shields.io/badge/Status-Active-blue)  
+![License](https://img.shields.io/badge/License-Proprietary-red)  
+![AI](https://img.shields.io/badge/AI-Decision%20Intelligence-purple)  
+![Governance](https://img.shields.io/badge/Governance-Global-green)  
 
 ---
 
-## Executive Summary  
+## 📖 Executive Summary  
 
 OMNIVERSE™ is a mathematically formalized, sovereign-neutral global decision intelligence standard designed to evaluate, optimize, and certify decision systems across governance, artificial intelligence, and multi-agent environments.  
 
-It is a **deployment-grade computational platform**, integrating:  
+It is a deployment-grade computational platform integrating:  
 
-- deterministic decision modeling  
-- real-time analytical evaluation  
+- Deterministic decision modeling  
+- Real-time analytical evaluation  
 - API-driven intelligence outputs  
-- interactive dashboard visualization  
-- reproducible and auditable architecture  
+- Interactive dashboard visualization  
+- Reproducible and auditable architecture  
 
-OMNIVERSE™ establishes a unified **decision sovereignty layer** across national, institutional, and global systems.  
+OMNIVERSE™ establishes a unified decision sovereignty layer across national, institutional, and global systems.  
 
 ---
 
 ## 🌐 Live System Access  
 
-- **Website (Live Platform):**  
-  https://bidyutmazumdar.github.io/omniverse-global-decision-standard/  
-
-- **Dashboard:**  
-  https://bidyutmazumdar.github.io/omniverse-global-decision-standard/dashboard.html  
-
-- **AI Engine:**  
-  https://bidyutmazumdar.github.io/omniverse-global-decision-standard/ai.html  
-
-- **Simulator:**  
-  https://bidyutmazumdar.github.io/omniverse-global-decision-standard/simulator.html  
-
-- **API (Backend):**  
-  http://localhost:3000  
-
----
-
-## Why This System Matters  
-
-OMNIVERSE™ is not a static paper — it is a **live sovereign intelligence system**.  
-
-It combines:  
-
-- formal mathematical modeling  
-- computational execution engine  
-- real-time scoring & ranking  
-- public analytical interface  
-- version-controlled reproducibility  
-
-Applicable for:  
-
-- academic and institutional review  
-- computational governance research  
-- policy and strategic intelligence  
-- AI alignment systems  
-- global standardization frameworks  
-
----
-
-## Mathematical Foundation  
-
-D = f(I, A, R, C, T)  
-
-Ds = (I × A × C) / (R × σt)  
-
-Io = ∑(wᵢ × Xᵢₙ)  
-
-Cs = Io × Rs × AGAPₙ × e^(−σt)  
-
-Ad = (Cs × Co × Io × Rs) × e^(−σt)  
-
----
-
-## System Architecture  
-
-OMNIVERSE™  
-↓  
-O.M.N.I.A.R.C.H™  
-↓  
-AEON™  
-
-Architecture Layer → O.M.N.I.A.R.C.H™  
-Execution Layer → AEON™  
-
-### Full Stack Flow  
-
-UI Layer → API Layer → Decision Engine → Data Layer → Validation Logic → Output Interface  
+- Website: https://bidyutmazumdar.github.io/omniverse-global-decision-standard/  
+- Dashboard: https://bidyutmazumdar.github.io/omniverse-global-decision-standard/dashboard.html  
+- AI Engine: https://bidyutmazumdar.github.io/omniverse-global-decision-standard/ai.html  
+- Simulator: https://bidyutmazumdar.github.io/omniverse-global-decision-standard/simulator.html  
+- API (Local): http://localhost:3000  
 
 ---
 
 ## 🧩 Architecture Diagram  
 
-![Architecture](https://via.placeholder.com/1000x400?text=OMNIVERSE+Architecture+Diagram)
+## 🌐 OMNIVERSE™ System Architecture  
+
+![OMNIVERSE™ System Architecture](./OMNIVERSE_Global_Architecture.png)  
+
+**Figure 1: OMNIVERSE™ System Architecture**  
+
+OMNIVERSE™ integrates governance architecture (**O.M.N.I.A.R.C.H™**) with an execution layer (**AEON™**) to enable real-time simulation, validation, and strategic intelligence outputs.  
 
 ---
 
-## Core System Components  
+## 🏗️ Core Architecture  
 
-- OMNIVERSE™ Core Standard  
-- OMNIVERSE™ Modular Architecture  
-- OMNIVERSE™ Decision Engine  
-- OMNIVERSE™ Index & Scoring Model  
-- OMNIVERSE™ Certification Framework  
-- OMNIVERSE™ Deployment Protocol  
+### 🔷 OMNIVERSE™ Standard  
+Global sovereign decision intelligence layer  
 
----
+### 🔷 O.M.N.I.A.R.C.H™  
+Governance architecture defining structural logic and policy alignment  
 
-## System Properties  
-
-- Deterministic  
-- Auditable  
-- Scalable  
-- Composable  
-- Interoperable  
-- Sovereign-neutral  
+### 🔷 AEON™ Execution Layer  
+- Simulation  
+- Forecasting  
+- Scenario Engine  
 
 ---
 
-## Implementation Scope  
+## 🔄 System Pipeline  
 
-- National Governance Systems  
-- Strategic Defense & Intelligence Frameworks  
-- Enterprise Decision Architectures  
-- AI Governance & Autonomous Systems  
-- Multi-Agent Coordination Environments  
+```
+User Interface  
+   ↓  
+API Layer (RESTful Endpoints)  
+   ↓  
+Data Layer (Global Datasets)  
+   ↓  
+Decision Engine (Analytical Core)  
+   ↓  
+Validation Logic (Traceability + Robustness)  
+   ↓  
+Output Interface (Scoring & Reports)  
+```
+
+---
+
+## ⚙️ Key Capabilities  
+
+- 🌍 Real-time global intelligence  
+- 🤖 AI-driven simulation and forecasting  
+- 📊 Multi-dimensional scoring systems  
+- 🔍 Validation, traceability, and robustness  
+- 🧠 Decision support for governments & enterprises  
 
 ---
 
@@ -147,138 +94,113 @@ UI Layer → API Layer → Decision Engine → Data Layer → Validation Logic �
 
 OMNIVERSE™ integrates real-world global datasets:  
 
-- **World Bank API** (GDP, infrastructure, macro indicators)  
-- **UN / UNDP** (Human Development Index)  
-- **ITU** (Cybersecurity & digital resilience metrics)  
+- World Bank API (GDP, infrastructure, macro indicators)  
+- UN / UNDP (Human Development Index)  
+- ITU (Cybersecurity & digital resilience metrics)  
 
 All datasets are normalized into a unified [0–1] decision scale.  
 
 ---
 
-## API Surface  
+## 🌐 Global Alignment  
 
-Endpoint | Type | Description  
---- | --- | ---  
-/ | Root | System status  
-/ai | POST | AI decision evaluation  
-/data/combined | GET | Unified dataset  
-/score/all | GET | Global scoring output  
-/score/top | GET | Top ranked systems  
+Aligned with international institutional frameworks:  
 
----
-
-## Example Request  
-
-curl http://localhost:3000/score/all  
+- World Bank  
+- United Nations (UN / UNDP)  
+- ITU  
+- OECD  
+- Oxford Insights  
 
 ---
 
-## System Definition  
+## 📊 Outputs  
 
-F : (I, A, R, C, T) → (Ad, Score, Rank)  
-
-Where:  
-
-I ∈ [0,1]  
-A ∈ [0,1]  
-R ∈ [0,1]  
-C ∈ [0,1]  
-
-Properties:  
-
-- bounded  
-- continuous  
-- deterministic  
-- reproducible  
+- Real-time intelligence outputs  
+- Global scoring & rankings  
+- Simulation dashboards  
+- AI evaluation reports  
 
 ---
 
-## Repository Structure  
+## 🧪 Use Cases  
 
-omniverse-global-decision-standard/  
-├── index.html  
-├── about.html  
-├── papers.html  
-├── simulator.html  
-├── ai.html  
-├── dashboard.html  
-├── server.js  
-├── style.css  
-├── script.js  
-├── README.md  
+- National policy simulation  
+- Economic forecasting  
+- Infrastructure planning  
+- Climate strategy modeling  
+- AI governance systems  
 
 ---
 
-## Version & Integrity  
+## 🧮 Mathematical Foundation  
 
-Canonical Release (DOI): **2026.1.0-A**  
-Live Deployment Build: **v2026.1.x**  
+```
+D = f(I, A, R, C, T)
 
-Principles:  
+Ds = (I × A × C) / (R × σt)
 
-- canonical release is immutable  
-- live system evolves independently  
-- scoring remains deterministic  
+Io = ∑(wᵢ × Xᵢₙ)
 
----
+Cs = Io × Rs × AGAPₙ × e^(−σt)
 
-## Documentation  
-
-- README.md — institutional overview  
-- GitHub Repository — execution layer  
-- Zenodo DOI — scholarly anchor  
+Ad = (Cs × Co × Io × Rs) × e^(−σt)
+```
 
 ---
 
-## Intended Use  
+## 🔌 API Surface  
 
-OMNIVERSE™ supports:  
+| Endpoint         | Type | Description                  |
+|----------------|------|------------------------------|
+| /              | GET  | System status                |
+| /ai            | POST | AI decision evaluation       |
+| /data/combined | GET  | Unified dataset              |
+| /score/all     | GET  | Global scoring output        |
+| /score/top     | GET  | Top ranked systems           |
 
-- decision intelligence modeling  
-- governance system evaluation  
-- strategic risk analysis  
-- AI alignment frameworks  
-- global benchmarking  
-
-This system is analytical and does not replace sovereign decision authorities.  
+**Example:**
+```
+curl http://localhost:3000/score/all
+```
 
 ---
 
-## Citation  
+## 📚 Citation  
 
+```
 Mazumdar, B. (2026).  
 OMNIVERSE™ — Global Decision Sovereignty & Strategic Intelligence Standard (v1.0).  
-Zenodo. https://doi.org/10.5281/zenodo.19430636  
+Zenodo. https://doi.org/10.5281/zenodo.19430636
+```
 
 ---
 
-## License  
+## 🧾 Author  
 
-Proprietary License:  
-https://github.com/BidyutMazumdar/omniverse-global-decision-standard/blob/main/LICENSE.txt  
+Dr. B. Mazumdar, D.Sc. (Hon.), D.Litt. (Hon.)  
+Architect of Modern Statehood  
+Founder & Principal Architect, FAIR+D Canon™  
 
-- All rights reserved  
-- No commercial use without permission  
-- No derivative redistribution  
-
----
-
-## Status  
-
-PUBLIC / LIVE / DEPLOYED / VERSIONED  
-
-- DOI Published  
-- Repository Active  
-- API Operational  
-- Dashboard Live  
-- System Executable  
+ORCID: https://orcid.org/0009-0007-5615-3558  
 
 ---
 
-## Closing Condition  
+## ⚖️ License  
 
-lim (σt → 0) ⇒ max (Ds)  
+Proprietary License  
+All rights reserved  
+No commercial use without permission  
+No derivative redistribution  
 
 ---
 
-© 2026 Dr. B. Mazumdar. All Rights Reserved.
+## 🚀 Vision  
+
+OMNIVERSE™ aims to establish a universal standard for decision intelligence, bridging AI, governance, and global systems into a single interoperable framework.  
+
+---
+
+> “From data to decision — from simulation to sovereignty.”  
+
+---
