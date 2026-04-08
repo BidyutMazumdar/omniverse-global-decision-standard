@@ -6,7 +6,6 @@
 
 <title>OMNIVERSE™ AI Decision Engine</title>
 
-<!-- SEO -->
 <meta name="description" content="OMNIVERSE™ AI Decision Engine — Strategic Evaluation of Risk, Stability, Governance, and Execution Capacity">
 <meta name="author" content="Dr. B. Mazumdar">
 
@@ -32,8 +31,9 @@
 <div class="section fade">
     <h1>AI Decision Engine</h1>
     <p>
-    A computational evaluation system for assessing strategic readiness 
-    across risk, governance, stability, and execution capacity.
+    A computational evaluation interface powered by OMNIVERSE™ AI,
+    enabling structured analysis of systemic risk, governance strength,
+    stability, and execution capacity.
     </p>
 </div>
 
@@ -53,8 +53,9 @@
         <label>Governance Strength (0 – 1)</label>
         <input type="range" min="0" max="1" step="0.01" id="governance">
 
-        <h2 id="score">Score: 0.0000</h2>
-        <h3 id="decision">Decision: —</h3>
+        <button class="btn" onclick="runAI()">Run AI Evaluation</button>
+
+        <h2 id="status">Status: Idle</h2>
 
     </div>
 </div>
@@ -62,8 +63,8 @@
 <!-- OUTPUT -->
 <div class="section fade">
     <div class="card">
-        <h3>System Interpretation</h3>
-        <p id="analysis">Awaiting input...</p>
+        <h3>AI Output</h3>
+        <p id="output">Awaiting evaluation...</p>
     </div>
 </div>
 
@@ -71,46 +72,53 @@
 
 <script>
 
-// CORE DECISION ENGINE
-function evaluate() {
+// API ENDPOINT (change if deployed)
+const API_URL = "http://localhost:3000/ai";
 
-    const r = +document.getElementById("risk").value;
-    const s = +document.getElementById("stability").value;
-    const c = +document.getElementById("capacity").value;
-    const g = +document.getElementById("governance").value;
+// RUN AI
+async function runAI() {
 
-    // Mathematical Core
-    const score = (s * c * g) * Math.exp(-r);
+    const risk = +document.getElementById("risk").value;
+    const stability = +document.getElementById("stability").value;
+    const capacity = +document.getElementById("capacity").value;
+    const governance = +document.getElementById("governance").value;
 
-    document.getElementById("score").innerText = "Score: " + score.toFixed(4);
+    const status = document.getElementById("status");
+    const output = document.getElementById("output");
 
-    let decision, analysis;
+    status.innerText = "Status: Processing...";
+    output.innerText = "Analyzing system...";
 
-    // Decision Logic
-    if (score > 0.75) {
-        decision = "High Confidence Approval";
-        analysis = "System demonstrates high resilience, strong governance, and optimal execution capability under low-risk conditions.";
-    } 
-    else if (score > 0.45) {
-        decision = "Conditional Approval";
-        analysis = "Moderate readiness detected. Strategic deployment feasible with adaptive monitoring and risk mitigation.";
-    } 
-    else {
-        decision = "High Risk — Rejection";
-        analysis = "System instability or excessive risk detected. Deployment is not recommended without structural improvement.";
+    try {
+
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                risk,
+                stability,
+                capacity,
+                governance
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "AI request failed");
+        }
+
+        status.innerText = "Status: Completed";
+        output.innerText = data.output;
+
+    } catch (error) {
+
+        status.innerText = "Status: Error";
+        output.innerText = "Error: " + error.message;
     }
-
-    document.getElementById("decision").innerText = "Decision: " + decision;
-    document.getElementById("analysis").innerText = analysis;
 }
-
-// EVENT BINDING (optimized)
-document.querySelectorAll("input").forEach(el => {
-    el.addEventListener("input", evaluate);
-});
-
-// INITIAL LOAD
-window.addEventListener("load", evaluate);
 
 </script>
 
