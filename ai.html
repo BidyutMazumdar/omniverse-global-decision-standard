@@ -16,6 +16,14 @@
     content="OMNIVERSE, AI decision engine, governance scoring, risk evaluation, stability index, strategic intelligence"
   />
 
+  <!-- Social Preview (recommended) -->
+  <meta property="og:title" content="OMNIVERSE™ — AI Decision Engine" />
+  <meta
+    property="og:description"
+    content="Structured evaluation of risk, stability, governance strength, and execution capacity through the OMNIVERSE™ demonstrative AI module."
+  />
+  <meta property="og:type" content="website" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -66,7 +74,7 @@
       <input type="range" min="0" max="1" step="0.01" id="governance" value="0.78" />
       <p id="governanceValue">0.78</p>
 
-      <button class="btn" onclick="runAI()">Run AI Evaluation</button>
+      <button class="btn" id="runAiBtn" type="button">Run AI Evaluation</button>
 
       <h2 id="status">Status: Idle</h2>
     </div>
@@ -96,100 +104,113 @@
     © 2026 Dr. B. Mazumdar — All Rights Reserved
   </footer>
 
+  <script src="script.js" defer></script>
+
   <script>
-    const sliders = [
-      { id: "risk", output: "riskValue" },
-      { id: "stability", output: "stabilityValue" },
-      { id: "capacity", output: "capacityValue" },
-      { id: "governance", output: "governanceValue" }
-    ];
+    document.addEventListener("DOMContentLoaded", () => {
+      const sliders = [
+        { id: "risk", output: "riskValue" },
+        { id: "stability", output: "stabilityValue" },
+        { id: "capacity", output: "capacityValue" },
+        { id: "governance", output: "governanceValue" }
+      ];
 
-    function bindSliderValues() {
-      sliders.forEach(({ id, output }) => {
-        const slider = document.getElementById(id);
-        const display = document.getElementById(output);
-
-        display.textContent = Number(slider.value).toFixed(2);
-
-        slider.addEventListener("input", () => {
-          display.textContent = Number(slider.value).toFixed(2);
-        });
-      });
-    }
-
-    function clamp(value) {
-      return Math.max(0, Math.min(1, value));
-    }
-
-    function classifyScore(score) {
-      if (score >= 0.90) {
-        return {
-          rank: "AAA",
-          badge: "🟢",
-          insight: "Exceptional system strength — highly resilient, strategically balanced, and near sovereign-grade in demonstrative evaluation."
-        };
-      } else if (score >= 0.80) {
-        return {
-          rank: "AA+",
-          badge: "🟢",
-          insight: "High-performing system — strong governance, execution capability, and low structural risk."
-        };
-      } else if (score >= 0.70) {
-        return {
-          rank: "AA",
-          badge: "🟡",
-          insight: "Strong system posture — generally stable with moderate optimization opportunities."
-        };
-      } else if (score >= 0.60) {
-        return {
-          rank: "A",
-          badge: "🟡",
-          insight: "Viable system profile — sound fundamentals with measurable room for structural improvement."
-        };
-      } else if (score >= 0.45) {
-        return {
-          rank: "BBB",
-          badge: "🟠",
-          insight: "Moderate system stability — elevated risk factors and capability gaps should be addressed."
-        };
-      } else {
-        return {
-          rank: "C",
-          badge: "🔴",
-          insight: "High-risk configuration — instability indicators suggest urgent intervention and redesign."
-        };
-      }
-    }
-
-    function runAI() {
-      const risk = clamp(Number(document.getElementById("risk").value));
-      const stability = clamp(Number(document.getElementById("stability").value));
-      const capacity = clamp(Number(document.getElementById("capacity").value));
-      const governance = clamp(Number(document.getElementById("governance").value));
-
+      const runButton = document.getElementById("runAiBtn");
       const status = document.getElementById("status");
       const output = document.getElementById("output");
 
-      status.textContent = "Status: Processing...";
-      output.textContent = "Running OMNIVERSE™ AI evaluation...";
+      function bindSliderValues() {
+        sliders.forEach(({ id, output: outputId }) => {
+          const slider = document.getElementById(id);
+          const display = document.getElementById(outputId);
 
-      /*
-        Demonstrative composite score model:
-        Higher stability, capacity, governance = positive
-        Higher risk = negative
-      */
-      const rawScore =
-        (stability * 0.30) +
-        (capacity * 0.25) +
-        (governance * 0.30) +
-        ((1 - risk) * 0.15);
+          if (!slider || !display) return;
 
-      const score = clamp(rawScore);
-      const { rank, badge, insight } = classifyScore(score);
+          display.textContent = Number(slider.value).toFixed(2);
 
-      const percentile = Math.round(score * 100);
+          slider.addEventListener("input", () => {
+            display.textContent = Number(slider.value).toFixed(2);
+          });
+        });
+      }
 
-      const result = `${badge} OMNIVERSE™ AI Evaluation Result
+      function clamp(value) {
+        return Math.max(0, Math.min(1, value));
+      }
+
+      function classifyScore(score) {
+        if (score >= 0.90) {
+          return {
+            rank: "AAA",
+            badge: "🟢",
+            insight: "Exceptional system strength — highly resilient, strategically balanced, and near sovereign-grade in demonstrative evaluation."
+          };
+        } else if (score >= 0.80) {
+          return {
+            rank: "AA+",
+            badge: "🟢",
+            insight: "High-performing system — strong governance, execution capability, and low structural risk."
+          };
+        } else if (score >= 0.70) {
+          return {
+            rank: "AA",
+            badge: "🟡",
+            insight: "Strong system posture — generally stable with moderate optimization opportunities."
+          };
+        } else if (score >= 0.60) {
+          return {
+            rank: "A",
+            badge: "🟡",
+            insight: "Viable system profile — sound fundamentals with measurable room for structural improvement."
+          };
+        } else if (score >= 0.45) {
+          return {
+            rank: "BBB",
+            badge: "🟠",
+            insight: "Moderate system stability — elevated risk factors and capability gaps should be addressed."
+          };
+        } else {
+          return {
+            rank: "C",
+            badge: "🔴",
+            insight: "High-risk configuration — instability indicators suggest urgent intervention and redesign."
+          };
+        }
+      }
+
+      function getSliderValue(id) {
+        const el = document.getElementById(id);
+        return el ? clamp(Number(el.value)) : 0;
+      }
+
+      function runAI() {
+        if (!status || !output) return;
+
+        const risk = getSliderValue("risk");
+        const stability = getSliderValue("stability");
+        const capacity = getSliderValue("capacity");
+        const governance = getSliderValue("governance");
+
+        status.textContent = "Status: Processing...";
+        output.textContent = "Running OMNIVERSE™ AI evaluation...";
+
+        /*
+          Demonstrative composite score model:
+          Higher stability, capacity, governance = positive
+          Higher risk = negative
+        */
+        const rawScore =
+          (stability * 0.30) +
+          (capacity * 0.25) +
+          (governance * 0.30) +
+          ((1 - risk) * 0.15);
+
+        const score = clamp(rawScore);
+        const { rank, badge, insight } = classifyScore(score);
+
+        const percentile = Math.round(score * 100);
+
+        const result = `${badge} OMNIVERSE™ AI Evaluation Result
 
 Score: ${score.toFixed(3)}
 Rank: ${rank}
@@ -198,31 +219,40 @@ Percentile: Top ${Math.max(1, 100 - percentile + 1)}%
 Analysis:
 ${insight}`;
 
-      localStorage.setItem(
-        "omniverse_result",
-        JSON.stringify({
-          timestamp: new Date().toISOString(),
-          risk,
-          stability,
-          capacity,
-          governance,
-          score,
-          rank,
-          percentile,
-          insight,
-          engine: "OMNIVERSE_AI_DEMO_V1"
-        })
-      );
+        try {
+          localStorage.setItem(
+            "omniverse_result",
+            JSON.stringify({
+              timestamp: new Date().toISOString(),
+              risk,
+              stability,
+              capacity,
+              governance,
+              score,
+              rank,
+              percentile,
+              insight,
+              engine: "OMNIVERSE_AI_DEMO_V1"
+            })
+          );
+        } catch (error) {
+          console.warn("Unable to save OMNIVERSE result to localStorage:", error);
+        }
 
-      setTimeout(() => {
-        status.textContent = "Status: Completed";
-        output.textContent = result;
-      }, 900);
-    }
+        window.setTimeout(() => {
+          status.textContent = "Status: Completed";
+          output.textContent = result;
+        }, 900);
+      }
 
-    bindSliderValues();
+      bindSliderValues();
+
+      if (runButton) {
+        runButton.addEventListener("click", runAI);
+      }
+
+      window.runAI = runAI;
+    });
   </script>
-
-  <script src="script.js"></script>
 </body>
 </html>
