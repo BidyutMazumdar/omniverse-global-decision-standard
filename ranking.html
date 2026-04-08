@@ -7,23 +7,20 @@
   <title>Ranking — OMNIVERSE™</title>
 
   <!-- SEO -->
-  <meta
-    name="description"
-    content="OMNIVERSE™ Ranking Interface — comparative score interpretation, benchmark bands, and demonstrative ranking outputs based on the OMNIVERSE™ decision intelligence framework."
-  />
+  <meta name="description"
+    content="OMNIVERSE™ Ranking Interface — comparative score interpretation, benchmark bands, and demonstrative ranking outputs based on the OMNIVERSE™ decision intelligence framework." />
   <meta name="author" content="Dr. B. Mazumdar" />
-  <meta
-    name="keywords"
-    content="OMNIVERSE ranking, AI scoring, benchmark framework, decision intelligence, comparative evaluation, governance analytics"
-  />
+  <meta name="keywords"
+    content="OMNIVERSE ranking, AI scoring, benchmark framework, decision intelligence, comparative evaluation, governance analytics" />
 
   <!-- Social Preview -->
   <meta property="og:title" content="Ranking — OMNIVERSE™" />
-  <meta
-    property="og:description"
-    content="Comparative ranking and benchmark interpretation within the OMNIVERSE™ decision intelligence framework."
-  />
+  <meta property="og:description"
+    content="Comparative ranking and benchmark interpretation within the OMNIVERSE™ decision intelligence framework." />
   <meta property="og:type" content="website" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.ico" />
 
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -31,8 +28,8 @@
 <body>
 
   <!-- NAVBAR -->
-  <div class="nav">
-    <div><b>OMNIVERSE™</b></div>
+  <nav class="nav">
+    <div><strong>OMNIVERSE™</strong></div>
     <div>
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
@@ -40,31 +37,31 @@
       <a href="simulator.html">Simulator</a>
       <a href="ai.html">AI Demo</a>
       <a href="dashboard.html">Dashboard</a>
-      <a href="ranking.html">Ranking</a>
+      <a href="ranking.html" aria-current="page">Ranking</a>
     </div>
-  </div>
+  </nav>
 
-  <!-- TITLE -->
-  <div class="section fade">
+  <!-- HEADER -->
+  <header class="section fade">
     <h1>Global Ranking Interface</h1>
     <p>
       Comparative score interpretation and benchmark-band display based on the
       OMNIVERSE™ decision intelligence framework.
     </p>
-  </div>
+  </header>
 
   <!-- USER RESULT -->
-  <div class="section fade">
+  <section class="section fade">
     <div class="card">
       <h2>Your Evaluation Result</h2>
       <p id="userScore">Score: --</p>
       <p id="userRank">Rank Band: --</p>
       <p id="userInsight">Interpretation: --</p>
     </div>
-  </div>
+  </section>
 
   <!-- BENCHMARK TABLE -->
-  <div class="section fade">
+  <section class="section fade">
     <h2>Illustrative Benchmark Bands</h2>
     <p>
       The following table is a demonstrative benchmark layer intended to show
@@ -76,9 +73,9 @@
       <table class="ranking-table">
         <thead>
           <tr>
-            <th>Reference Profile</th>
-            <th>Score</th>
-            <th>Rank Band</th>
+            <th scope="col">Reference Profile</th>
+            <th scope="col">Score</th>
+            <th scope="col">Rank Band</th>
           </tr>
         </thead>
         <tbody>
@@ -90,10 +87,10 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </section>
 
   <!-- METHODOLOGY ACCESS -->
-  <div class="section fade">
+  <section class="section fade">
     <div class="card">
       <h2>Methodology Reference</h2>
       <p>
@@ -102,56 +99,62 @@
       </p>
 
       <div class="cta-group">
-        <a
-          class="btn"
+        <a class="btn"
           href="https://doi.org/10.5281/zenodo.19430636"
           target="_blank"
-          rel="noopener noreferrer"
-        >
+          rel="noopener noreferrer">
           View DOI
         </a>
-        <a
-          class="btn"
+
+        <a class="btn"
           href="https://github.com/BidyutMazumdar/omniverse-global-decision-standard"
           target="_blank"
-          rel="noopener noreferrer"
-        >
+          rel="noopener noreferrer">
           GitHub
         </a>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- RESEARCH NOTE -->
-  <div class="section fade">
+  <section class="section fade">
     <div class="card">
       <h3>Research Note</h3>
       <p>
-        Unless connected to a live validated dataset or formally published benchmark release,
-        ranking outputs on this page should be read as framework-based interpretive demonstrations,
-        prototype comparative bands, or model-output illustrations within the broader OMNIVERSE™ ecosystem.
+        Unless connected to a validated dataset or formally published benchmark release,
+        ranking outputs should be interpreted as demonstrative comparative bands,
+        prototype analytical models, or framework-based illustrations within the broader
+        OMNIVERSE™ ecosystem.
       </p>
     </div>
-  </div>
+  </section>
 
   <!-- FOOTER -->
   <footer>
     © 2026 Dr. B. Mazumdar — All Rights Reserved
   </footer>
 
-  <!-- Shared UI behaviors -->
+  <!-- Shared UI -->
   <script src="script.js" defer></script>
 
-  <!-- Page-specific ranking logic -->
+  <!-- PAGE LOGIC -->
   <script>
-    (function () {
+    document.addEventListener("DOMContentLoaded", () => {
       const scoreEl = document.getElementById("userScore");
       const rankEl = document.getElementById("userRank");
       const insightEl = document.getElementById("userInsight");
 
+      function resetUI(message = "No evaluation data available") {
+        if (scoreEl) scoreEl.textContent = message;
+        if (rankEl) rankEl.textContent = "";
+        if (insightEl) insightEl.textContent = "";
+      }
+
       try {
         const raw = localStorage.getItem("omniverse_result");
-        const data = raw ? JSON.parse(raw) : null;
+        if (!raw) return resetUI();
+
+        const data = JSON.parse(raw);
 
         if (
           data &&
@@ -160,20 +163,17 @@
           typeof data.rank === "string" &&
           typeof data.insight === "string"
         ) {
-          scoreEl.textContent = "Score: " + data.score.toFixed(3);
-          rankEl.textContent = "Rank Band: " + data.rank;
-          insightEl.textContent = "Interpretation: " + data.insight;
+          scoreEl.textContent = `Score: ${data.score.toFixed(3)}`;
+          rankEl.textContent = `Rank Band: ${data.rank}`;
+          insightEl.textContent = `Interpretation: ${data.insight}`;
         } else {
-          scoreEl.textContent = "No evaluation data available";
-          rankEl.textContent = "";
-          insightEl.textContent = "";
+          resetUI();
         }
       } catch (error) {
-        scoreEl.textContent = "No evaluation data available";
-        rankEl.textContent = "";
-        insightEl.textContent = "";
+        console.warn("Ranking load error:", error);
+        resetUI();
       }
-    })();
+    });
   </script>
 
 </body>
