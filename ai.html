@@ -1,136 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>OMNIVERSE™ AI Decision Engine</title>
+  <title>OMNIVERSE™ — AI Decision Engine</title>
 
-<meta name="description" content="OMNIVERSE™ AI Decision Engine — Strategic Evaluation of Risk, Stability, Governance, and Execution Capacity">
-<meta name="author" content="Dr. B. Mazumdar">
+  <meta
+    name="description"
+    content="OMNIVERSE™ AI Decision Engine — structured evaluation of risk, stability, governance strength, and execution capacity."
+  />
+  <meta name="author" content="Dr. B. Mazumdar" />
+  <meta
+    name="keywords"
+    content="OMNIVERSE, AI decision engine, governance scoring, risk evaluation, stability index, strategic intelligence"
+  />
 
-<link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-<div class="nav">
+  <!-- NAVBAR -->
+  <div class="nav">
     <div><b>OMNIVERSE™</b></div>
     <div>
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="papers.html">Papers</a>
-        <a href="simulator.html">Simulator</a>
-        <a href="ai.html">AI Demo</a>
-        <a href="dashboard.html">Dashboard</a>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="papers.html">Papers</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="ai.html">AI Demo</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="ranking.html">Ranking</a>
     </div>
-</div>
+  </div>
 
-<div class="section fade">
+  <!-- HERO -->
+  <div class="section fade">
     <h1>AI Decision Engine</h1>
     <p>
-    A computational evaluation interface powered by OMNIVERSE™ AI,
-    enabling structured analysis of systemic risk, governance strength,
-    stability, and execution capacity.
+      A structured computational evaluation interface powered by OMNIVERSE™,
+      designed to assess systemic risk, governance strength, stability,
+      and execution capacity through a demonstrative decision intelligence model.
     </p>
-</div>
+  </div>
 
-<div class="section fade">
+  <!-- ENGINE -->
+  <div class="section fade">
     <div class="card">
+      <h2>Evaluation Inputs</h2>
 
-        <label>Risk Level (0 – 1)</label>
-        <input type="range" min="0" max="1" step="0.01" id="risk">
+      <label for="risk">Risk Level (0 – 1)</label>
+      <input type="range" min="0" max="1" step="0.01" id="risk" value="0.30" />
+      <p id="riskValue">0.30</p>
 
-        <label>Stability Index (0 – 1)</label>
-        <input type="range" min="0" max="1" step="0.01" id="stability">
+      <label for="stability">Stability Index (0 – 1)</label>
+      <input type="range" min="0" max="1" step="0.01" id="stability" value="0.75" />
+      <p id="stabilityValue">0.75</p>
 
-        <label>Execution Capacity (0 – 1)</label>
-        <input type="range" min="0" max="1" step="0.01" id="capacity">
+      <label for="capacity">Execution Capacity (0 – 1)</label>
+      <input type="range" min="0" max="1" step="0.01" id="capacity" value="0.72" />
+      <p id="capacityValue">0.72</p>
 
-        <label>Governance Strength (0 – 1)</label>
-        <input type="range" min="0" max="1" step="0.01" id="governance">
+      <label for="governance">Governance Strength (0 – 1)</label>
+      <input type="range" min="0" max="1" step="0.01" id="governance" value="0.78" />
+      <p id="governanceValue">0.78</p>
 
-        <button class="btn" onclick="runAI()">Run AI Evaluation</button>
+      <button class="btn" onclick="runAI()">Run AI Evaluation</button>
 
-        <h2 id="status">Status: Idle</h2>
-
+      <h2 id="status">Status: Idle</h2>
     </div>
-</div>
+  </div>
 
-<div class="section fade">
+  <!-- OUTPUT -->
+  <div class="section fade">
     <div class="card">
-        <h3>AI Output</h3>
-        <p id="output">Awaiting evaluation...</p>
+      <h2>AI Output</h2>
+      <p id="output">Awaiting evaluation...</p>
     </div>
-</div>
+  </div>
 
-<script>
+  <!-- SYSTEM NOTE -->
+  <div class="section fade">
+    <div class="card">
+      <h3>Public Note</h3>
+      <p>
+        This AI Decision Engine is a demonstrative evaluation module within the OMNIVERSE™
+        framework. Scores, ranks, and insights shown here are prototype analytical outputs
+        intended for research, simulation, and reference modeling unless explicitly stated otherwise.
+      </p>
+    </div>
+  </div>
 
-function runAI() {
+  <footer>
+    © 2026 Dr. B. Mazumdar — All Rights Reserved
+  </footer>
 
-    const risk = +document.getElementById("risk").value;
-    const stability = +document.getElementById("stability").value;
-    const capacity = +document.getElementById("capacity").value;
-    const governance = +document.getElementById("governance").value;
+  <script>
+    const sliders = [
+      { id: "risk", output: "riskValue" },
+      { id: "stability", output: "stabilityValue" },
+      { id: "capacity", output: "capacityValue" },
+      { id: "governance", output: "governanceValue" }
+    ];
 
-    const status = document.getElementById("status");
-    const output = document.getElementById("output");
+    function bindSliderValues() {
+      sliders.forEach(({ id, output }) => {
+        const slider = document.getElementById(id);
+        const display = document.getElementById(output);
 
-    status.innerText = "Status: Processing...";
-    output.innerText = "Running OMNIVERSE™ AI evaluation...";
+        display.textContent = Number(slider.value).toFixed(2);
 
-    const score = (stability + capacity + governance - risk) / 3;
-
-    let level, insight, color;
-
-    if (score >= 0.8) {
-        level = "AAA";
-        insight = "High Stability — Sovereign-grade system with optimal governance and execution.";
-        color = "🟢";
-    } 
-    else if (score >= 0.6) {
-        level = "AA";
-        insight = "Strong System — Minor optimization required in risk balancing.";
-        color = "🟡";
-    } 
-    else if (score >= 0.4) {
-        level = "BB";
-        insight = "Moderate Stability — Structural improvements recommended.";
-        color = "🟠";
-    } 
-    else {
-        level = "C";
-        insight = "High Risk — System instability detected. Immediate intervention required.";
-        color = "🔴";
+        slider.addEventListener("input", () => {
+          display.textContent = Number(slider.value).toFixed(2);
+        });
+      });
     }
 
-    const result = `
-${color} OMNIVERSE™ AI Evaluation Result
+    function clamp(value) {
+      return Math.max(0, Math.min(1, value));
+    }
+
+    function classifyScore(score) {
+      if (score >= 0.90) {
+        return {
+          rank: "AAA",
+          badge: "🟢",
+          insight: "Exceptional system strength — highly resilient, strategically balanced, and near sovereign-grade in demonstrative evaluation."
+        };
+      } else if (score >= 0.80) {
+        return {
+          rank: "AA+",
+          badge: "🟢",
+          insight: "High-performing system — strong governance, execution capability, and low structural risk."
+        };
+      } else if (score >= 0.70) {
+        return {
+          rank: "AA",
+          badge: "🟡",
+          insight: "Strong system posture — generally stable with moderate optimization opportunities."
+        };
+      } else if (score >= 0.60) {
+        return {
+          rank: "A",
+          badge: "🟡",
+          insight: "Viable system profile — sound fundamentals with measurable room for structural improvement."
+        };
+      } else if (score >= 0.45) {
+        return {
+          rank: "BBB",
+          badge: "🟠",
+          insight: "Moderate system stability — elevated risk factors and capability gaps should be addressed."
+        };
+      } else {
+        return {
+          rank: "C",
+          badge: "🔴",
+          insight: "High-risk configuration — instability indicators suggest urgent intervention and redesign."
+        };
+      }
+    }
+
+    function runAI() {
+      const risk = clamp(Number(document.getElementById("risk").value));
+      const stability = clamp(Number(document.getElementById("stability").value));
+      const capacity = clamp(Number(document.getElementById("capacity").value));
+      const governance = clamp(Number(document.getElementById("governance").value));
+
+      const status = document.getElementById("status");
+      const output = document.getElementById("output");
+
+      status.textContent = "Status: Processing...";
+      output.textContent = "Running OMNIVERSE™ AI evaluation...";
+
+      /*
+        Demonstrative composite score model:
+        Higher stability, capacity, governance = positive
+        Higher risk = negative
+      */
+      const rawScore =
+        (stability * 0.30) +
+        (capacity * 0.25) +
+        (governance * 0.30) +
+        ((1 - risk) * 0.15);
+
+      const score = clamp(rawScore);
+      const { rank, badge, insight } = classifyScore(score);
+
+      const percentile = Math.round(score * 100);
+
+      const result = `${badge} OMNIVERSE™ AI Evaluation Result
 
 Score: ${score.toFixed(3)}
-Rank: ${level}
+Rank: ${rank}
+Percentile: Top ${Math.max(1, 100 - percentile + 1)}%
 
 Analysis:
-${insight}
-`;
+${insight}`;
 
-    localStorage.setItem("omniverse_result", JSON.stringify({
-        risk,
-        stability,
-        capacity,
-        governance,
-        score,
-        rank: level,
-        insight
-    }));
+      localStorage.setItem(
+        "omniverse_result",
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          risk,
+          stability,
+          capacity,
+          governance,
+          score,
+          rank,
+          percentile,
+          insight,
+          engine: "OMNIVERSE_AI_DEMO_V1"
+        })
+      );
 
-    setTimeout(() => {
-        status.innerText = "Status: Completed";
-        output.innerText = result;
-    }, 900);
-}
+      setTimeout(() => {
+        status.textContent = "Status: Completed";
+        output.textContent = result;
+      }, 900);
+    }
 
-</script>
+    bindSliderValues();
+  </script>
 
+  <script src="script.js"></script>
 </body>
 </html>
