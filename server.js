@@ -1,27 +1,47 @@
 // =======================================
-// OMNIVERSE™ AI SERVER — ULTIMATE EDITION
-// Secure • Robust • Production-Ready
+// OMNIVERSE™ AI SERVER — FINAL LOCK v1.2.0
+// Secure • Stable • Production-Hardened
 // =======================================
 
 import express from "express";
 import dotenv from "dotenv";
-
-// Native fetch (Node 18+) fallback safe import
 import fetch from "node-fetch";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 
 const app = express();
 
 // =======================================
-// MIDDLEWARE
+// CORE CONFIG
 // =======================================
+const PORT = process.env.PORT || 3000;
+const API_KEY = process.env.OPENAI_API_KEY;
+
+if (!API_KEY) {
+    console.error("FATAL: OPENAI_API_KEY is missing");
+    process.exit(1);
+}
+
+// =======================================
+// SECURITY LAYER 🔥
+// =======================================
+
+// Rate Limiting (anti-abuse)
+const limiter = rateLimit({
+    windowMs: 60 * 1000, // 1 min
+    max: 30 // max 30 requests/min per IP
+});
+
+app.use(limiter);
+
+// JSON Limit
 app.use(express.json({ limit: "1mb" }));
 
-// Basic CORS (secure controlled)
+// CORS (controlled)
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "POST, GET");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     next();
 });
@@ -31,59 +51,74 @@ app.use((req, res, next) => {
 // =======================================
 app.get("/", (req, res) => {
     res.json({
-        status: "OMNIVERSE™ AI Server Active",
-        version: "v1.0.0",
-        uptime: process.uptime()
+        system: "OMNIVERSE™ AI Core",
+        status: "ACTIVE",
+        version: "v1.2.0",
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString()
     });
 });
 
 // =======================================
-// CORE AI ENDPOINT
+// VALIDATION ENGINE
 // =======================================
-app.post("/ai", async (req, res) => {
+function validateInput(input) {
+    const { risk, stability, capacity, governance } = input;
 
-    try {
-        const { risk, stability, capacity, governance } = req.body;
+    const values = [risk, stability, capacity, governance];
 
-        // INPUT VALIDATION
-        if (
-            [risk, stability, capacity, governance].some(
-                v => typeof v !== "number" || v < 0 || v > 1
-            )
-        ) {
-            return res.status(400).json({
-                error: "Invalid input. All values must be numbers between 0 and 1."
-            });
-        }
+    return values.every(v => typeof v === "number" && v >= 0 && v <= 1);
+}
 
-        // PROMPT ENGINEERING (HIGH PRECISION)
-        const prompt = `
-OMNIVERSE™ Decision Evaluation Protocol
+// =======================================
+// PROMPT ENGINE
+// =======================================
+function buildPrompt({ risk, stability, capacity, governance }) {
+    return `
+OMNIVERSE™ Strategic Decision Intelligence Protocol
 
-Inputs:
+INPUT VECTOR:
 Risk = ${risk}
 Stability = ${stability}
 Capacity = ${capacity}
 Governance = ${governance}
 
-Task:
-1. Evaluate systemic viability
-2. Identify risk-stability balance
-3. Provide strategic classification
+TASK:
+- Evaluate system viability
+- Detect instability factors
+- Recommend execution stance
 
-Output Format:
-- Decision Level
-- Risk Insight
-- Strategic Recommendation
+OUTPUT:
+1. Decision Level
+2. Risk Insight
+3. Strategic Action
 
-Keep response concise, analytical, and executive-grade.
-        `;
+Constraints:
+Concise • Analytical • Executive-grade
+`;
+}
 
-        // API CALL
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+// =======================================
+// AI ROUTE
+// =======================================
+app.post("/ai", async (req, res) => {
+
+    try {
+        const input = req.body;
+
+        if (!validateInput(input)) {
+            return res.status(400).json({
+                success: false,
+                error: "INVALID_INPUT"
+            });
+        }
+
+        const prompt = buildPrompt(input);
+
+        const apiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                "Authorization": `Bearer ${API_KEY}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -91,52 +126,54 @@ Keep response concise, analytical, and executive-grade.
                 messages: [
                     {
                         role: "system",
-                        content: "You are a high-level strategic AI decision system."
+                        content: "You are a sovereign-grade AI strategic intelligence system."
                     },
                     {
                         role: "user",
                         content: prompt
                     }
                 ],
-                temperature: 0.4
+                temperature: 0.3
             })
         });
 
-        const data = await response.json();
+        const data = await apiResponse.json();
 
-        // ERROR HANDLING (API)
-        if (!response.ok) {
-            return res.status(500).json({
-                error: "AI API Error",
-                details: data
+        if (!apiResponse.ok) {
+            return res.status(502).json({
+                success: false,
+                error: "AI_UPSTREAM_ERROR"
             });
         }
 
-        const result = data?.choices?.[0]?.message?.content || "No response generated.";
+        const output = data?.choices?.[0]?.message?.content ?? "No output";
 
-        // SUCCESS RESPONSE
         res.json({
             success: true,
-            timestamp: new Date().toISOString(),
-            input: { risk, stability, capacity, governance },
-            result
+            output
         });
 
     } catch (err) {
 
-        // INTERNAL ERROR HANDLING
         res.status(500).json({
-            error: "Internal Server Error",
-            message: err.message
+            success: false,
+            error: "SERVER_ERROR"
         });
     }
 });
 
 // =======================================
-// SERVER INIT
+// 404
 // =======================================
-const PORT = process.env.PORT || 3000;
+app.use((req, res) => {
+    res.status(404).json({
+        error: "NOT_FOUND"
+    });
+});
 
+// =======================================
+// START
+// =======================================
 app.listen(PORT, () => {
-    console.log(`OMNIVERSE™ AI Server running on port ${PORT}`);
+    console.log(`OMNIVERSE™ LIVE → http://localhost:${PORT}`);
 });
