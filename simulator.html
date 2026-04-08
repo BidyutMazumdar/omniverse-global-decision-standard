@@ -6,29 +6,18 @@
 
   <title>OMNIVERSE™ Simulator</title>
 
-  <!-- SEO -->
-  <meta
-    name="description"
-    content="OMNIVERSE™ Adoption Readiness Simulator — Quantitative Decision Modeling Platform"
-  />
+  <meta name="description" content="OMNIVERSE™ Adoption Readiness Simulator — Quantitative Decision Modeling Platform" />
   <meta name="author" content="Dr. B. Mazumdar" />
 
-  <!-- Social Preview -->
   <meta property="og:title" content="OMNIVERSE™ Simulator" />
-  <meta
-    property="og:description"
-    content="OMNIVERSE™ Adoption Readiness Simulator — interactive quantitative decision modeling demonstration."
-  />
+  <meta property="og:description" content="OMNIVERSE™ Adoption Readiness Simulator — interactive quantitative decision modeling demonstration." />
   <meta property="og:type" content="website" />
 
-  <!-- External CSS -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 </head>
 <body>
-  <!-- NAVBAR -->
+
   <div class="nav">
     <div><b>OMNIVERSE™</b></div>
     <div>
@@ -43,246 +32,166 @@
   </div>
 
   <main>
-    <!-- TITLE -->
-    <section class="section fade" aria-labelledby="simulator-title">
-      <h1 id="simulator-title">Adoption Readiness Simulator</h1>
-      <p>
-        Interactive demonstration of a multi-variable adoption readiness model
-        using normalized input factors.
-      </p>
+
+    <section class="section">
+      <h1>Adoption Readiness Simulator</h1>
+      <p>Hybrid Decision Intelligence Model (Local + API Engine)</p>
     </section>
 
-    <!-- NOSCRIPT FALLBACK -->
-    <noscript>
-      <section class="section">
-        <div class="card">
-          <p>
-            JavaScript is required to run the OMNIVERSE™ Simulator.
-            Please enable JavaScript to use the interactive model and chart.
-          </p>
-        </div>
-      </section>
-    </noscript>
-
-    <!-- SIMULATOR -->
-    <section class="section fade" aria-labelledby="simulator-controls-title">
+    <section class="section">
       <div class="card">
-        <h2 id="simulator-controls-title">Model Inputs</h2>
 
-        <label for="Cs">Cs (Certification Score): <span id="CsValue">0.80</span></label>
+        <label>Cs: <span id="CsValue">0.80</span></label>
         <input type="range" min="0" max="1" step="0.01" id="Cs" value="0.80" />
 
-        <label for="Co">Co (Compliance Score): <span id="CoValue">0.75</span></label>
+        <label>Co: <span id="CoValue">0.75</span></label>
         <input type="range" min="0" max="1" step="0.01" id="Co" value="0.75" />
 
-        <label for="Io">Io (Index Score): <span id="IoValue">0.70</span></label>
+        <label>Io: <span id="IoValue">0.70</span></label>
         <input type="range" min="0" max="1" step="0.01" id="Io" value="0.70" />
 
-        <label for="Rs">Rs (Resilience Score): <span id="RsValue">0.85</span></label>
+        <label>Rs: <span id="RsValue">0.85</span></label>
         <input type="range" min="0" max="1" step="0.01" id="Rs" value="0.85" />
 
-        <label for="sigma">σ (Volatility): <span id="sigmaValue">0.30</span></label>
+        <label>σ: <span id="sigmaValue">0.30</span></label>
         <input type="range" min="0" max="1" step="0.01" id="sigma" value="0.30" />
 
-        <h2 id="result" aria-live="polite">Ad = 0.0000</h2>
+        <h2 id="result">Ad = 0.0000</h2>
 
-        <p style="margin-top: 12px; font-size: 0.95rem; opacity: 0.85;">
-          Model: <code>Ad = (Cs × Co × Io × Rs) × e<sup>-σ</sup></code>
+        <button id="runSim">Run Advanced Simulation</button>
+
+        <p style="margin-top:10px;">
+          Ad = (Cs × Co × Io × Rs) × e<sup>-σ</sup>
         </p>
+
       </div>
     </section>
 
-    <!-- GRAPH -->
-    <section class="section fade" aria-labelledby="chart-title">
+    <section class="section">
       <div class="card">
-        <h2 id="chart-title">Volatility Sensitivity Curve</h2>
-        <canvas id="chart" aria-label="Adoption readiness chart" role="img"></canvas>
-        <p id="chartFallback" style="display:none; margin-top:12px; font-size:0.95rem; opacity:0.85;">
-          Chart visualization could not be loaded. The numerical simulator remains available.
-        </p>
+        <h2>Volatility Sensitivity</h2>
+        <canvas id="chart"></canvas>
       </div>
     </section>
+
   </main>
 
-  <script>
-    "use strict";
+<script>
+"use strict";
 
-    // ======================================
-    // SAFE DOM HELPERS
-    // ======================================
-    function byId(id) {
-      return document.getElementById(id);
+function byId(id){ return document.getElementById(id); }
+
+function clamp(v,min,max){ return Math.min(Math.max(v,min),max); }
+
+function getInputs(){
+  return {
+    Cs: +byId("Cs").value,
+    Co: +byId("Co").value,
+    Io: +byId("Io").value,
+    Rs: +byId("Rs").value,
+    sigma: +byId("sigma").value
+  };
+}
+
+function updateDisplay(i){
+  byId("CsValue").textContent=i.Cs.toFixed(2);
+  byId("CoValue").textContent=i.Co.toFixed(2);
+  byId("IoValue").textContent=i.Io.toFixed(2);
+  byId("RsValue").textContent=i.Rs.toFixed(2);
+  byId("sigmaValue").textContent=i.sigma.toFixed(2);
+}
+
+function calculate(Cs,Co,Io,Rs,sigma){
+  return (Cs*Co*Io*Rs)*Math.exp(-sigma);
+}
+
+let chart=null;
+
+function initChart(){
+  const canvas = byId("chart");
+  if (!canvas || typeof Chart === "undefined") return;
+
+  const ctx = canvas.getContext("2d");
+
+  chart=new Chart(ctx,{
+    type:"line",
+    data:{labels:[],datasets:[{label:"Ad vs σ",data:[],borderWidth:2}]},
+    options:{responsive:true,scales:{y:{beginAtZero:true,max:1}}}
+  });
+}
+
+function update(){
+  const i=getInputs();
+  updateDisplay(i);
+
+  const Ad=calculate(i.Cs,i.Co,i.Io,i.Rs,i.sigma);
+  byId("result").textContent="Ad = "+Ad.toFixed(4);
+
+  if(!chart)return;
+
+  const labels=[],data=[];
+  for(let s=0;s<=1;s+=0.05){
+    labels.push(s.toFixed(2));
+    data.push(calculate(i.Cs,i.Co,i.Io,i.Rs,s));
+  }
+
+  chart.data.labels=labels;
+  chart.data.datasets[0].data=data;
+  chart.update();
+}
+
+async function runBackend(){
+  try{
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Login required");
+      return;
     }
 
-    function safeNumber(value, fallback = 0) {
-      const n = Number(value);
-      return Number.isFinite(n) ? n : fallback;
-    }
+    const i=getInputs();
 
-    function clamp(value, min, max) {
-      return Math.min(Math.max(value, min), max);
-    }
-
-    // ======================================
-    // CORE MODEL
-    // Ad = (Cs * Co * Io * Rs) * e^(-sigma)
-    // ======================================
-    function calculateAd(Cs, Co, Io, Rs, sigma) {
-      const cCs = clamp(safeNumber(Cs, 0), 0, 1);
-      const cCo = clamp(safeNumber(Co, 0), 0, 1);
-      const cIo = clamp(safeNumber(Io, 0), 0, 1);
-      const cRs = clamp(safeNumber(Rs, 0), 0, 1);
-      const cSigma = clamp(safeNumber(sigma, 0), 0, 1);
-
-      return (cCs * cCo * cIo * cRs) * Math.exp(-cSigma);
-    }
-
-    // ======================================
-    // CHART INIT (SAFE)
-    // ======================================
-    let chart = null;
-
-    function initChart() {
-      const canvas = byId("chart");
-      const fallback = byId("chartFallback");
-
-      if (!canvas || typeof Chart === "undefined") {
-        if (fallback) fallback.style.display = "block";
-        return;
-      }
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        if (fallback) fallback.style.display = "block";
-        return;
-      }
-
-      chart = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: "Ad vs σ",
-              data: [],
-              fill: false,
-              tension: 0.25,
-              borderWidth: 2,
-              pointRadius: 2
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          scales: {
-            x: {
-              title: {
-                display: true,
-                text: "σ (Volatility)"
-              }
-            },
-            y: {
-              beginAtZero: true,
-              max: 1,
-              title: {
-                display: true,
-                text: "Adoption Readiness (Ad)"
-              }
-            }
-          },
-          plugins: {
-            legend: {
-              display: true
-            },
-            tooltip: {
-              enabled: true
-            }
-          }
-        }
-      });
-    }
-
-    // ======================================
-    // READ INPUTS
-    // ======================================
-    function getInputs() {
-      return {
-        Cs: safeNumber(byId("Cs")?.value, 0.8),
-        Co: safeNumber(byId("Co")?.value, 0.75),
-        Io: safeNumber(byId("Io")?.value, 0.7),
-        Rs: safeNumber(byId("Rs")?.value, 0.85),
-        sigma: safeNumber(byId("sigma")?.value, 0.3)
-      };
-    }
-
-    // ======================================
-    // UPDATE DISPLAY VALUES
-    // ======================================
-    function updateDisplayValues(inputs) {
-      const map = [
-        ["CsValue", inputs.Cs],
-        ["CoValue", inputs.Co],
-        ["IoValue", inputs.Io],
-        ["RsValue", inputs.Rs],
-        ["sigmaValue", inputs.sigma]
-      ];
-
-      map.forEach(([id, value]) => {
-        const el = byId(id);
-        if (el) el.textContent = Number(value).toFixed(2);
-      });
-    }
-
-    // ======================================
-    // UPDATE RESULT + CHART
-    // ======================================
-    function update() {
-      const { Cs, Co, Io, Rs, sigma } = getInputs();
-
-      updateDisplayValues({ Cs, Co, Io, Rs, sigma });
-
-      const Ad = calculateAd(Cs, Co, Io, Rs, sigma);
-
-      const result = byId("result");
-      if (result) {
-        result.textContent = "Ad = " + Ad.toFixed(4);
-      }
-
-      if (!chart) return;
-
-      const labels = [];
-      const data = [];
-
-      for (let s = 0; s <= 1.0001; s += 0.05) {
-        const rounded = Number(s.toFixed(2));
-        labels.push(rounded.toFixed(2));
-        data.push(Number(calculateAd(Cs, Co, Io, Rs, rounded).toFixed(6)));
-      }
-
-      chart.data.labels = labels;
-      chart.data.datasets[0].data = data;
-      chart.update();
-    }
-
-    // ======================================
-    // SAFE INIT
-    // ======================================
-    document.addEventListener("DOMContentLoaded", () => {
-      initChart();
-
-      const sliderIds = ["Cs", "Co", "Io", "Rs", "sigma"];
-
-      sliderIds.forEach((id) => {
-        const el = byId(id);
-        if (el) {
-          el.addEventListener("input", update);
-          el.addEventListener("change", update);
-        }
-      });
-
-      update();
+    const res=await fetch("/simulate",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":`Bearer ${token}`
+      },
+      body:JSON.stringify({
+        risk:i.sigma,
+        stability:i.Rs,
+        execution:i.Io,
+        governance:i.Co
+      })
     });
-  </script>
+
+    if(!res.ok) throw new Error();
+
+    const d=await res.json();
+
+    byId("result").innerHTML=
+      "Score: "+d.score+"<br>"+
+      "Rank: "+d.rank+"<br>"+
+      d.interpretation;
+
+  }catch{
+    alert("Simulation Failed");
+  }
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  initChart();
+
+  ["Cs","Co","Io","Rs","sigma"].forEach(id=>{
+    const el = byId(id);
+    if (el) el.addEventListener("input",update);
+  });
+
+  const btn = byId("runSim");
+  if (btn) btn.addEventListener("click",runBackend);
+
+  update();
+});
+</script>
+
 </body>
 </html>
