@@ -1,108 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>OMNIVERSE™ Global Ranking</title>
+  <title>Ranking — OMNIVERSE™</title>
 
-<link rel="stylesheet" href="style.css">
+  <!-- SEO -->
+  <meta
+    name="description"
+    content="OMNIVERSE™ Ranking Interface — comparative score interpretation, benchmark bands, and demonstrative ranking outputs based on the OMNIVERSE™ decision intelligence framework."
+  />
+  <meta name="author" content="Dr. B. Mazumdar" />
+  <meta
+    name="keywords"
+    content="OMNIVERSE ranking, AI scoring, benchmark framework, decision intelligence, comparative evaluation, governance analytics"
+  />
 
-<style>
-.section { padding: 40px; text-align: center; }
-.card {
-    background: #111;
-    color: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    margin: 20px auto;
-    max-width: 600px;
-}
-table {
-    width: 90%;
-    margin: 30px auto;
-    border-collapse: collapse;
-}
-th, td {
-    padding: 12px;
-    border: 1px solid #444;
-}
-th { background: #222; }
-</style>
+  <!-- Social Preview -->
+  <meta property="og:title" content="Ranking — OMNIVERSE™" />
+  <meta
+    property="og:description"
+    content="Comparative ranking and benchmark interpretation within the OMNIVERSE™ decision intelligence framework."
+  />
+  <meta property="og:type" content="website" />
 
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-<!-- NAVBAR -->
-<div class="nav">
+  <!-- NAVBAR -->
+  <div class="nav">
     <div><b>OMNIVERSE™</b></div>
     <div>
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="papers.html">Papers</a>
-        <a href="simulator.html">Simulator</a>
-        <a href="ai.html">AI Demo</a>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="ranking.html">Ranking</a>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="papers.html">Papers</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="ai.html">AI Demo</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="ranking.html">Ranking</a>
     </div>
-</div>
+  </div>
 
-<!-- TITLE -->
-<div class="section">
-    <h1>🌍 Global Ranking System</h1>
-    <p>Real-time evaluation ranking based on OMNIVERSE™ AI scoring framework</p>
-</div>
+  <!-- TITLE -->
+  <div class="section fade">
+    <h1>Global Ranking Interface</h1>
+    <p>
+      Comparative score interpretation and benchmark-band display based on the
+      OMNIVERSE™ decision intelligence framework.
+    </p>
+  </div>
 
-<!-- USER RESULT -->
-<div class="section">
+  <!-- USER RESULT -->
+  <div class="section fade">
     <div class="card">
-        <h2>Your System Result</h2>
-        <p id="userScore">Score: --</p>
-        <p id="userRank">Rank: --</p>
-        <p id="userInsight">Insight: --</p>
+      <h2>Your Evaluation Result</h2>
+      <p id="userScore">Score: --</p>
+      <p id="userRank">Rank Band: --</p>
+      <p id="userInsight">Interpretation: --</p>
     </div>
-</div>
+  </div>
 
-<!-- GLOBAL TABLE -->
-<div class="section">
-    <h2>📊 Global Benchmark Ranking</h2>
+  <!-- BENCHMARK TABLE -->
+  <div class="section fade">
+    <h2>Illustrative Benchmark Bands</h2>
+    <p>
+      The following table is a demonstrative benchmark layer intended to show
+      how OMNIVERSE™ scores may be comparatively interpreted within structured
+      ranking bands.
+    </p>
 
-    <table>
-        <tr>
-            <th>Entity</th>
+    <div class="table-wrap">
+      <table class="ranking-table">
+        <thead>
+          <tr>
+            <th>Reference Profile</th>
             <th>Score</th>
-            <th>Rank</th>
-        </tr>
-        <tr><td>System Alpha</td><td>0.91</td><td>AAA</td></tr>
-        <tr><td>System Beta</td><td>0.84</td><td>AA+</td></tr>
-        <tr><td>System Gamma</td><td>0.76</td><td>AA</td></tr>
-        <tr><td>System Delta</td><td>0.63</td><td>A</td></tr>
-        <tr><td>System Epsilon</td><td>0.48</td><td>BBB</td></tr>
-    </table>
-</div>
+            <th>Rank Band</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>System Alpha</td><td>0.91</td><td>AAA</td></tr>
+          <tr><td>System Beta</td><td>0.84</td><td>AA+</td></tr>
+          <tr><td>System Gamma</td><td>0.76</td><td>AA</td></tr>
+          <tr><td>System Delta</td><td>0.63</td><td>A</td></tr>
+          <tr><td>System Epsilon</td><td>0.48</td><td>BBB</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-<script>
+  <!-- METHODOLOGY ACCESS -->
+  <div class="section fade">
+    <div class="card">
+      <h2>Methodology Reference</h2>
+      <p>
+        For conceptual grounding and publication context, refer to the OMNIVERSE™
+        core framework publication and repository materials.
+      </p>
 
-// Load saved AI result
-const data = JSON.parse(localStorage.getItem("omniverse_result"));
+      <div class="cta-group">
+        <a
+          class="btn"
+          href="https://doi.org/10.5281/zenodo.19430636"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View DOI
+        </a>
+        <a
+          class="btn"
+          href="https://github.com/BidyutMazumdar/omniverse-global-decision-standard"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
 
-if (data) {
-    document.getElementById("userScore").innerText =
-        "Score: " + data.score.toFixed(3);
+  <!-- RESEARCH NOTE -->
+  <div class="section fade">
+    <div class="card">
+      <h3>Research Note</h3>
+      <p>
+        Unless connected to a live validated dataset or formally published benchmark release,
+        ranking outputs on this page should be read as framework-based interpretive demonstrations,
+        prototype comparative bands, or model-output illustrations within the broader OMNIVERSE™ ecosystem.
+      </p>
+    </div>
+  </div>
 
-    document.getElementById("userRank").innerText =
-        "Rank: " + data.rank;
+  <!-- FOOTER -->
+  <footer>
+    © 2026 Dr. B. Mazumdar — All Rights Reserved
+  </footer>
 
-    document.getElementById("userInsight").innerText =
-        "Insight: " + data.insight;
-} else {
-    document.getElementById("userScore").innerText = "No data available";
-    document.getElementById("userRank").innerText = "";
-    document.getElementById("userInsight").innerText = "";
-}
+  <script>
+    (function () {
+      const scoreEl = document.getElementById("userScore");
+      const rankEl = document.getElementById("userRank");
+      const insightEl = document.getElementById("userInsight");
 
-</script>
+      try {
+        const raw = localStorage.getItem("omniverse_result");
+        const data = raw ? JSON.parse(raw) : null;
+
+        if (
+          data &&
+          typeof data.score === "number" &&
+          isFinite(data.score) &&
+          typeof data.rank === "string" &&
+          typeof data.insight === "string"
+        ) {
+          scoreEl.textContent = "Score: " + data.score.toFixed(3);
+          rankEl.textContent = "Rank Band: " + data.rank;
+          insightEl.textContent = "Interpretation: " + data.insight;
+        } else {
+          scoreEl.textContent = "No evaluation data available";
+          rankEl.textContent = "";
+          insightEl.textContent = "";
+        }
+      } catch (error) {
+        scoreEl.textContent = "No evaluation data available";
+        rankEl.textContent = "";
+        insightEl.textContent = "";
+      }
+    })();
+  </script>
 
 </body>
 </html>
