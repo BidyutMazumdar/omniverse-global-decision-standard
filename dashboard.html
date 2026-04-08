@@ -1,8 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>OMNIVERSE™ Global Dashboard</title>
+
+<!-- SEO -->
+<meta name="description" content="OMNIVERSE™ Global Intelligence Dashboard — Country-Level Decision Analytics and Strategic Scoring">
+<meta name="author" content="Dr. B. Mazumdar">
 
 <link rel="stylesheet" href="style.css">
 
@@ -13,37 +19,54 @@
 
 <body>
 
+<!-- NAVBAR -->
 <div class="nav">
     <div><b>OMNIVERSE™</b></div>
     <div>
         <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="papers.html">Papers</a>
         <a href="simulator.html">Simulator</a>
-        <a href="ai.html">AI</a>
+        <a href="ai.html">AI Demo</a>
         <a href="dashboard.html">Dashboard</a>
     </div>
 </div>
 
-<div class="section">
+<!-- TITLE -->
+<div class="section fade">
     <h1>Global Intelligence Dashboard</h1>
+    <p>Country-level decision scoring, analytics, and comparative strategic intelligence</p>
 </div>
 
 <!-- WORLD MAP -->
-<div class="section">
+<div class="section fade">
     <div class="card">
+        <h2>World Map (Coming Next Upgrade)</h2>
         <canvas id="map"></canvas>
     </div>
 </div>
 
 <!-- ANALYTICS -->
-<div class="section">
+<div class="section fade">
     <div class="card">
+        <h2>Decision Score by Country</h2>
         <canvas id="analytics"></canvas>
     </div>
 </div>
 
+<!-- TOP RANKING -->
+<div class="section fade">
+    <div class="card">
+        <h2>Top Performing Systems</h2>
+        <ul id="ranking"></ul>
+    </div>
+</div>
+
+<script src="script.js"></script>
+
 <script>
 
-// Dummy Country Data (upgrade later)
+// COUNTRY DATA (Upgradeable to API later)
 const data = [
     {country: "India", value: 0.75},
     {country: "USA", value: 0.85},
@@ -51,7 +74,18 @@ const data = [
     {country: "Germany", value: 0.78}
 ];
 
-// Analytics Chart
+// SORT RANKING
+const sorted = [...data].sort((a, b) => b.value - a.value);
+
+// DISPLAY RANKING
+const rankingList = document.getElementById("ranking");
+sorted.forEach((d, i) => {
+    const li = document.createElement("li");
+    li.innerText = `${i+1}. ${d.country} — Score: ${d.value}`;
+    rankingList.appendChild(li);
+});
+
+// BAR CHART
 new Chart(document.getElementById("analytics"), {
     type: "bar",
     data: {
@@ -60,6 +94,12 @@ new Chart(document.getElementById("analytics"), {
             label: "Decision Score",
             data: data.map(d => d.value)
         }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        }
     }
 });
 
