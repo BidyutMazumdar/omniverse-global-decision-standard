@@ -1,88 +1,121 @@
-// OMNIVERSE™ Global Script — Ultimate Production Version
+// OMNIVERSE™ Global Script — 100% LOCK Edition
+// Production-safe, performance-aware, GitHub Pages compatible
 
-// ===============================
-// FADE ANIMATION SYSTEM
-// ===============================
+(() => {
+  "use strict";
 
-const elements = document.querySelectorAll(".fade");
+  // ==========================================
+  // CONFIG
+  // ==========================================
+  const REVEAL_OFFSET = 100;
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function revealOnScroll() {
+  // ==========================================
+  // FADE / REVEAL SYSTEM
+  // ==========================================
+  function getFadeElements() {
+    return document.querySelectorAll(".fade");
+  }
+
+  function revealOnScroll() {
+    const elements = getFadeElements();
     const windowHeight = window.innerHeight;
 
-    elements.forEach(el => {
-        const elementTop = el.getBoundingClientRect().top;
+    elements.forEach((el) => {
+      const elementTop = el.getBoundingClientRect().top;
 
-        if (elementTop < windowHeight - 100) {
-            el.classList.add("show");
-        }
+      if (elementTop < windowHeight - REVEAL_OFFSET) {
+        el.classList.add("show");
+      }
     });
-}
+  }
 
-// Scroll trigger
-window.addEventListener("scroll", revealOnScroll);
+  function revealAllImmediately() {
+    const elements = getFadeElements();
+    elements.forEach((el) => el.classList.add("show"));
+  }
 
-// Load trigger (important)
-window.addEventListener("load", revealOnScroll);
+  // ==========================================
+  // SMOOTH SCROLL SYSTEM
+  // ==========================================
+  function initSmoothScroll() {
+    const anchors = document.querySelectorAll('a[href^="#"]');
 
+    anchors.forEach((anchor) => {
+      anchor.addEventListener("click", function (e) {
+        const targetSelector = this.getAttribute("href");
 
-// ===============================
-// SMOOTH SCROLL SYSTEM
-// ===============================
+        // Ignore plain "#" links
+        if (!targetSelector || targetSelector === "#") return;
 
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener("click", function(e) {
-        e.preventDefault();
-
-        const target = document.querySelector(this.getAttribute("href"));
+        const target = document.querySelector(targetSelector);
 
         if (target) {
-            target.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
+          e.preventDefault();
+          target.scrollIntoView({
+            behavior: prefersReducedMotion ? "auto" : "smooth",
+            block: "start",
+          });
         }
+      });
     });
-});
+  }
 
+  // ==========================================
+  // ACTIVE NAV LINK SYSTEM
+  // ==========================================
+  function normalizePage(pathname) {
+    const page = pathname.split("/").pop() || "index.html";
+    return page === "" ? "index.html" : page;
+  }
 
-// ===============================
-// GLOBAL UI ENHANCEMENT
-// ===============================
+  function initActiveNavLink() {
+    const links = document.querySelectorAll(".nav a");
+    if (!links.length) return;
 
-// Navbar active link highlight
-const links = document.querySelectorAll(".nav a");
-const currentPage = window.location.pathname.split("/").pop();
+    const currentPage = normalizePage(window.location.pathname);
 
-links.forEach(link => {
-    if (link.getAttribute("href") === currentPage) {
-        link.style.color = "#7f5cff";
-        link.style.fontWeight = "bold";
-    }
-});
+    links.forEach((link) => {
+      const href = link.getAttribute("href");
+      if (href === currentPage) {
+        link.classList.add("active-link");
+        link.setAttribute("aria-current", "page");
+      }
+    });
+  }
 
+  // ==========================================
+  // THROTTLED SCROLL HANDLER
+  // ==========================================
+  let ticking = false;
 
-// ===============================
-// PERFORMANCE OPTIMIZATION
-// ===============================
+  function onScroll() {
+    if (prefersReducedMotion) return;
 
-// Throttle scroll events (smooth + efficient)
-let ticking = false;
-
-window.addEventListener("scroll", () => {
     if (!ticking) {
-        window.requestAnimationFrame(() => {
-            revealOnScroll();
-            ticking = false;
-        });
-        ticking = true;
+      window.requestAnimationFrame(() => {
+        revealOnScroll();
+        ticking = false;
+      });
+      ticking = true;
     }
-});
+  }
 
+  // ==========================================
+  // INIT
+  // ==========================================
+  function init() {
+    initSmoothScroll();
+    initActiveNavLink();
 
-// ===============================
-// SAFE INIT (FOR ALL PAGES)
-// ===============================
+    if (prefersReducedMotion) {
+      revealAllImmediately();
+    } else {
+      revealOnScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("load", revealOnScroll);
+    }
+  }
 
-document.addEventListener("DOMContentLoaded", () => {
-    revealOnScroll();
-});
+  document.addEventListener("DOMContentLoaded", init);
+})();
