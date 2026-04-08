@@ -14,7 +14,6 @@
 
 <body>
 
-<!-- NAVBAR -->
 <div class="nav">
     <div><b>OMNIVERSE™</b></div>
     <div>
@@ -27,7 +26,6 @@
     </div>
 </div>
 
-<!-- TITLE -->
 <div class="section fade">
     <h1>AI Decision Engine</h1>
     <p>
@@ -37,7 +35,6 @@
     </p>
 </div>
 
-<!-- INPUT -->
 <div class="section fade">
     <div class="card">
 
@@ -60,7 +57,6 @@
     </div>
 </div>
 
-<!-- OUTPUT -->
 <div class="section fade">
     <div class="card">
         <h3>AI Output</h3>
@@ -68,15 +64,9 @@
     </div>
 </div>
 
-<script src="script.js"></script>
-
 <script>
 
-// API ENDPOINT (change if deployed)
-const API_URL = "http://localhost:3000/ai";
-
-// RUN AI
-async function runAI() {
+function runAI() {
 
     const risk = +document.getElementById("risk").value;
     const stability = +document.getElementById("stability").value;
@@ -87,37 +77,57 @@ async function runAI() {
     const output = document.getElementById("output");
 
     status.innerText = "Status: Processing...";
-    output.innerText = "Analyzing system...";
+    output.innerText = "Running OMNIVERSE™ AI evaluation...";
 
-    try {
+    const score = (stability + capacity + governance - risk) / 3;
 
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                risk,
-                stability,
-                capacity,
-                governance
-            })
-        });
+    let level, insight, color;
 
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.error || "AI request failed");
-        }
-
-        status.innerText = "Status: Completed";
-        output.innerText = data.output;
-
-    } catch (error) {
-
-        status.innerText = "Status: Error";
-        output.innerText = "Error: " + error.message;
+    if (score >= 0.8) {
+        level = "AAA";
+        insight = "High Stability — Sovereign-grade system with optimal governance and execution.";
+        color = "🟢";
+    } 
+    else if (score >= 0.6) {
+        level = "AA";
+        insight = "Strong System — Minor optimization required in risk balancing.";
+        color = "🟡";
+    } 
+    else if (score >= 0.4) {
+        level = "BB";
+        insight = "Moderate Stability — Structural improvements recommended.";
+        color = "🟠";
+    } 
+    else {
+        level = "C";
+        insight = "High Risk — System instability detected. Immediate intervention required.";
+        color = "🔴";
     }
+
+    const result = `
+${color} OMNIVERSE™ AI Evaluation Result
+
+Score: ${score.toFixed(3)}
+Rank: ${level}
+
+Analysis:
+${insight}
+`;
+
+    localStorage.setItem("omniverse_result", JSON.stringify({
+        risk,
+        stability,
+        capacity,
+        governance,
+        score,
+        rank: level,
+        insight
+    }));
+
+    setTimeout(() => {
+        status.innerText = "Status: Completed";
+        output.innerText = result;
+    }, 900);
 }
 
 </script>
