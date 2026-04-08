@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>OMNIVERSE™ Global Ranking</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+.section { padding: 40px; text-align: center; }
+.card {
+    background: #111;
+    color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 20px auto;
+    max-width: 600px;
+}
+table {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 12px;
+    border: 1px solid #444;
+}
+th { background: #222; }
+</style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="nav">
+    <div><b>OMNIVERSE™</b></div>
+    <div>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="papers.html">Papers</a>
+        <a href="simulator.html">Simulator</a>
+        <a href="ai.html">AI Demo</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="ranking.html">Ranking</a>
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="section">
+    <h1>🌍 Global Ranking System</h1>
+    <p>Real-time evaluation ranking based on OMNIVERSE™ AI scoring framework</p>
+</div>
+
+<!-- USER RESULT -->
+<div class="section">
+    <div class="card">
+        <h2>Your System Result</h2>
+        <p id="userScore">Score: --</p>
+        <p id="userRank">Rank: --</p>
+        <p id="userInsight">Insight: --</p>
+    </div>
+</div>
+
+<!-- GLOBAL TABLE -->
+<div class="section">
+    <h2>📊 Global Benchmark Ranking</h2>
+
+    <table>
+        <tr>
+            <th>Entity</th>
+            <th>Score</th>
+            <th>Rank</th>
+        </tr>
+        <tr><td>System Alpha</td><td>0.91</td><td>AAA</td></tr>
+        <tr><td>System Beta</td><td>0.84</td><td>AA+</td></tr>
+        <tr><td>System Gamma</td><td>0.76</td><td>AA</td></tr>
+        <tr><td>System Delta</td><td>0.63</td><td>A</td></tr>
+        <tr><td>System Epsilon</td><td>0.48</td><td>BBB</td></tr>
+    </table>
+</div>
+
+<script>
+
+// Load saved AI result
+const data = JSON.parse(localStorage.getItem("omniverse_result"));
+
+if (data) {
+    document.getElementById("userScore").innerText =
+        "Score: " + data.score.toFixed(3);
+
+    document.getElementById("userRank").innerText =
+        "Rank: " + data.rank;
+
+    document.getElementById("userInsight").innerText =
+        "Insight: " + data.insight;
+} else {
+    document.getElementById("userScore").innerText = "No data available";
+    document.getElementById("userRank").innerText = "";
+    document.getElementById("userInsight").innerText = "";
+}
+
+</script>
+
+</body>
+</html>
