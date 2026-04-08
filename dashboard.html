@@ -6,13 +6,11 @@
 
 <title>OMNIVERSE™ Global Dashboard</title>
 
-<!-- SEO -->
-<meta name="description" content="OMNIVERSE™ Global Intelligence Dashboard — Country-Level Decision Analytics, Strategic Scoring, and Comparative System Evaluation">
+<meta name="description" content="OMNIVERSE™ Global Intelligence Dashboard — Real-time sovereign decision analytics, ranking, and geospatial visualization">
 <meta name="author" content="Dr. B. Mazumdar">
 
 <link rel="stylesheet" href="style.css">
 
-<!-- Chart Systems -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-geo"></script>
 
@@ -37,12 +35,12 @@
 <div class="section fade">
     <h1>Global Intelligence Dashboard</h1>
     <p>
-    Comparative decision analytics framework for evaluating sovereign systems 
-    through structured scoring, ranking, and visual intelligence models.
+    Real-time sovereign decision intelligence system integrating data-driven scoring,
+    comparative analytics, and geospatial visualization.
     </p>
 </div>
 
-<!-- WORLD MAP -->
+<!-- MAP -->
 <div class="section fade">
     <div class="card">
         <h2>Global Decision Map</h2>
@@ -53,7 +51,7 @@
 <!-- ANALYTICS -->
 <div class="section fade">
     <div class="card">
-        <h2>Decision Score Analytics</h2>
+        <h2>Top 20 Decision Scores</h2>
         <canvas id="analytics"></canvas>
     </div>
 </div>
@@ -61,7 +59,7 @@
 <!-- RANKING -->
 <div class="section fade">
     <div class="card">
-        <h2>System Ranking</h2>
+        <h2>Global Ranking</h2>
         <ul id="ranking"></ul>
     </div>
 </div>
@@ -71,57 +69,77 @@
 <script>
 
 // =======================================
-// DATA LAYER (Structured + Expandable)
+// GLOBAL STATE
 // =======================================
-const dataset = [
-    { country: "India", code: "IND", value: 0.75 },
-    { country: "United States", code: "USA", value: 0.85 },
-    { country: "China", code: "CHN", value: 0.80 },
-    { country: "Germany", code: "DEU", value: 0.78 }
-];
+let globalData = [];
 
 // =======================================
-// RANKING ENGINE
+// LOAD DATA FROM BACKEND
 // =======================================
-const sorted = [...dataset].sort((a, b) => b.value - a.value);
+async function loadData() {
+    try {
+        const res = await fetch("/score/all");
+        const data = await res.json();
 
-const rankingList = document.getElementById("ranking");
-rankingList.innerHTML = "";
+        globalData = data.slice(0, 50);
 
-sorted.forEach((d, i) => {
-    const li = document.createElement("li");
-    li.textContent = `${i + 1}. ${d.country} — ${d.value.toFixed(2)}`;
-    rankingList.appendChild(li);
-});
+        renderRanking();
+        renderChart();
+        renderMap();
+
+    } catch (err) {
+        document.getElementById("ranking").innerHTML =
+            "<li>Data load error</li>";
+        console.error(err);
+    }
+}
 
 // =======================================
-// BAR CHART (ANALYTICS)
+// RANKING
 // =======================================
-new Chart(document.getElementById("analytics"), {
-    type: "bar",
-    data: {
-        labels: dataset.map(d => d.country),
-        datasets: [{
-            label: "Decision Score",
-            data: dataset.map(d => d.value)
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false }
+function renderRanking() {
+    const list = document.getElementById("ranking");
+    list.innerHTML = "";
+
+    globalData.slice(0, 20).forEach((d, i) => {
+        const li = document.createElement("li");
+        li.textContent = `${i + 1}. ${d.country} — ${d.score.toFixed(3)}`;
+        list.appendChild(li);
+    });
+}
+
+// =======================================
+// BAR CHART
+// =======================================
+function renderChart() {
+    const top = globalData.slice(0, 20);
+
+    new Chart(document.getElementById("analytics"), {
+        type: "bar",
+        data: {
+            labels: top.map(d => d.country),
+            datasets: [{
+                label: "Decision Score",
+                data: top.map(d => d.score)
+            }]
         },
-        scales: {
-            y: {
-                min: 0,
-                max: 1
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    max: 1
+                }
             }
         }
-    }
-});
+    });
+}
 
 // =======================================
-// WORLD MAP (GEO ENGINE — CLEAN BASE)
+// WORLD MAP ENGINE
 // =======================================
 async function renderMap() {
 
@@ -134,10 +152,11 @@ async function renderMap() {
     ).features;
 
     const mapData = countries.map(country => {
-        const match = dataset.find(d => d.code === country.id);
+        const match = globalData.find(d => d.code === country.id);
+
         return {
             feature: country,
-            value: match ? match.value : 0
+            value: match ? match.score : 0
         };
     });
 
@@ -146,13 +165,12 @@ async function renderMap() {
         data: {
             labels: countries.map(d => d.properties.name),
             datasets: [{
-                label: "Global Decision Score",
+                label: "Decision Score",
                 data: mapData
             }]
         },
         options: {
             showOutline: true,
-            showGraticule: false,
             plugins: {
                 legend: { display: false }
             },
@@ -166,8 +184,10 @@ async function renderMap() {
     });
 }
 
-// INIT MAP
-renderMap();
+// =======================================
+// INIT
+// =======================================
+window.onload = loadData;
 
 </script>
 
