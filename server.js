@@ -1,11 +1,14 @@
-// =======================================
-// OMNIVERSE™ AI + DATA SERVER — v3.3.1 ABSOLUTE LOCK FINAL
-// Production-Safe • Claims-Safe • ESM Compatible • Render/Railway/Node 18+ Ready
-// Canonical Release
-// =======================================
+/* =======================================
+   OMNIVERSE™ FINAL CORE — v1
+   
+======================================= */
 
 import express from "express";
 import dotenv from "dotenv";
+import pkg from "pg";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import Redis from "ioredis";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import cors from "cors";
@@ -13,569 +16,290 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
+const { Pool } = pkg;
 
-// =======================================
-// CORE CONFIG
-// =======================================
-const PORT = Number.parseInt(process.env.PORT, 10) || 3000;
-const API_KEY = process.env.OPENAI_API_KEY || "";
+const fetch = globalThis.fetch || (await import("node-fetch")).default;
+
+if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET missing");
+if (process.env.JWT_SECRET.length < 32) throw new Error("JWT_SECRET too weak");
+if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
+
+const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET;
+const API_KEY = process.env.OPENAI_API_KEY;
 const NODE_ENV = process.env.NODE_ENV || "development";
 
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour
-const FETCH_TIMEOUT_MS = 15000;
-const AI_TIMEOUT_MS = 30000;
-const MAX_TOP_N = 100;
-const SHUTDOWN_TIMEOUT_MS = 10000;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: NODE_ENV === "production"
+    ? { rejectUnauthorized: false }
+    : false
+});
 
-// =======================================
-// CORS CONFIG
-// Supports:
-//   ALLOWED_ORIGIN=*
-//   ALLOWED_ORIGIN=https://example.com
-//   ALLOWED_ORIGIN=https://a.com,https://b.com
-// =======================================
-function parseAllowedOrigins(value) {
-  if (!value || value.trim() === "*") return "*";
+let redis = null;
 
-  const list = value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+if (process.env.REDIS_URL) {
+  try {
+    redis = new Redis(process.env.REDIS_URL, {
+      maxRetriesPerRequest: 2,
+      enableReadyCheck: false,
+      retryStrategy: () => null
+    });
 
-  return list.length ? list : "*";
+    redis.on("error", (err) => {
+      if (NODE_ENV !== "production") {
+        console.warn("Redis error:", err.message);
+      }
+    });
+
+  } catch {}
 }
 
-const ALLOWED_ORIGINS = parseAllowedOrigins(process.env.ALLOWED_ORIGIN || "*");
-
-// =======================================
-// SECURITY LAYER
-// =======================================
-app.disable("x-powered-by");
-app.set("trust proxy", true); // robust for Render / Railway / reverse proxies
-
-app.use(
-  helmet({
-    crossOriginResourcePolicy: false
-  })
-);
-
-app.use(
-  cors({
-    origin(origin, callback) {
-      // Allow server-to-server tools / curl / Postman / same-origin requests without Origin header
-      if (!origin) return callback(null, true);
-
-      if (ALLOWED_ORIGINS === "*") {
-        return callback(null, true);
-      }
-
-      if (Array.isArray(ALLOWED_ORIGINS) && ALLOWED_ORIGINS.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(createError(403, "CORS_BLOCKED", "Origin not allowed by CORS policy"));
-    },
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-  })
-);
-
-app.use(
-  rateLimit({
-    windowMs: 60 * 1000,
-    max: 60,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: {
-      error: "RATE_LIMIT_EXCEEDED",
-      message: "Too many requests. Please try again shortly."
-    }
-  })
-);
+app.set("trust proxy", 1);
 
 app.use(express.json({ limit: "1mb" }));
 
-// =======================================
-// IN-MEMORY CACHE
-// =======================================
-const cache = {
-  combined: null,
-  timestamp: 0
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
+
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true);
+    if (ALLOWED_ORIGIN === "*") return cb(null, true);
+    if (origin === ALLOWED_ORIGIN) return cb(null, true);
+    return cb(new Error("CORS_BLOCKED"));
+  }
+}));
+
+app.use(rateLimit({
+  windowMs: 60000,
+  max: NODE_ENV === "production" ? 150 : 100,
+  keyGenerator: (req) => req.ip
+}));
+
+const createError = (status, msg) => {
+  const e = new Error(msg);
+  e.status = status;
+  return e;
 };
 
-// =======================================
-// UTILS
-// =======================================
-function normalize(value, min, max) {
-  if (!Number.isFinite(value) || !Number.isFinite(min) || !Number.isFinite(max)) {
-    return 0;
-  }
-  if (max === min) return 0;
-  return (value - min) / (max - min);
-}
+const asyncHandler = fn => (req, res, next) =>
+  Promise.resolve(fn(req, res, next)).catch(next);
 
-function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max);
-}
-
-function toSafeNumber(value, fallback = 0.5) {
-  const num = Number(value);
-  return Number.isFinite(num) ? num : fallback;
-}
-
-function boundedUnitValue(value, fallback = 0.5) {
-  return clamp(toSafeNumber(value, fallback), 0, 1);
-}
-
-function createError(status, code, message) {
-  const err = new Error(message);
-  err.status = status;
-  err.code = code;
-  return err;
-}
-
-function asyncHandler(fn) {
-  return (req, res, next) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
-}
-
-function extractResponseText(apiResponse) {
-  if (typeof apiResponse?.output_text === "string" && apiResponse.output_text.trim()) {
-    return apiResponse.output_text.trim();
-  }
-
-  if (Array.isArray(apiResponse?.output)) {
-    for (const item of apiResponse.output) {
-      if (Array.isArray(item?.content)) {
-        for (const part of item.content) {
-          if (typeof part?.text === "string" && part.text.trim()) {
-            return part.text.trim();
-          }
-        }
-      }
-    }
-  }
-
-  return "No output available.";
-}
-
-async function fetchJsonWithTimeout(url, options = {}, timeoutMs = FETCH_TIMEOUT_MS) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+const auth = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "UNAUTHORIZED" });
 
   try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal
-    });
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    return res.status(403).json({ error: "INVALID_TOKEN" });
+  }
+};
 
-    if (!response.ok) {
-      let details = "";
+app.post("/auth/register", asyncHandler(async (req, res) => {
+  const { email, password, name } = req.body;
 
-      try {
-        const errorPayload = await response.text();
-        details = errorPayload ? ` | ${errorPayload.slice(0, 300)}` : "";
-      } catch {
-        // ignore read failure
-      }
+  if (!email || !password) throw createError(400, "INVALID_INPUT");
 
-      throw createError(
-        502,
-        "UPSTREAM_HTTP_ERROR",
-        `Upstream request failed with status ${response.status}${details}`
+  const hash = await bcrypt.hash(password, 10);
+
+  const user = await pool.query(
+    `INSERT INTO users (name,email,password_hash)
+     VALUES ($1,$2,$3)
+     ON CONFLICT (email) DO NOTHING
+     RETURNING id,email`,
+    [name || "User", email, hash]
+  );
+
+  if (!user.rows.length) throw createError(400, "USER_EXISTS");
+
+  const org = await pool.query(
+    `INSERT INTO organizations (name)
+     VALUES ($1) RETURNING id`,
+    [`${email}-org`]
+  );
+
+  await pool.query(
+    `INSERT INTO memberships (user_id, org_id)
+     VALUES ($1,$2)`,
+    [user.rows[0].id, org.rows[0].id]
+  );
+
+  res.json(user.rows[0]);
+}));
+
+app.post("/auth/login", asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) throw createError(400, "INVALID_INPUT");
+
+  const user = await pool.query(
+    `SELECT * FROM users WHERE email=$1`,
+    [email]
+  );
+
+  if (!user.rows.length) throw createError(401, "INVALID_LOGIN");
+
+  const valid = await bcrypt.compare(password, user.rows[0].password_hash);
+  if (!valid) throw createError(401, "INVALID_LOGIN");
+
+  const org = await pool.query(
+    `SELECT org_id FROM memberships WHERE user_id=$1 LIMIT 1`,
+    [user.rows[0].id]
+  );
+
+  if (!org.rows.length) throw createError(500, "ORG_NOT_FOUND");
+
+  const token = jwt.sign(
+    { userId: user.rows[0].id, orgId: org.rows[0].org_id },
+    JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  res.json({ token });
+}));
+
+async function fetchWorldBank() {
+  const url = "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.CD?format=json&per_page=20000";
+
+  const res = await fetch(url);
+  if (!res.ok) throw createError(500, "WB_API_FAIL");
+
+  const data = await res.json();
+  return data?.[1]?.slice(0, 100) || [];
+}
+
+const computeScore = d => Math.log1p(d.value) / 10;
+
+app.get("/score/all", auth, asyncHandler(async (req, res) => {
+
+  const cacheKey = `scores:${req.user.orgId}`;
+
+  try {
+    if (redis) {
+      const cached = await redis.get(cacheKey);
+      if (cached) return res.json(JSON.parse(cached));
+    }
+  } catch {}
+
+  const data = await fetchWorldBank();
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const scores = [];
+
+    for (const row of data) {
+      if (!row.value) continue;
+
+      const score = computeScore(row);
+
+      scores.push({
+        country: row.country.value,
+        code: row.country.id,
+        score
+      });
+
+      await client.query(
+        `INSERT INTO scores (org_id,country,code,score)
+         VALUES ($1,$2,$3,$4)
+         ON CONFLICT (org_id, code)
+         DO UPDATE SET score = EXCLUDED.score`,
+        [req.user.orgId, row.country.value, row.country.id, score]
       );
     }
 
-    return await response.json();
+    await client.query("COMMIT");
+
+    try {
+      if (redis) {
+        await redis.set(cacheKey, JSON.stringify(scores), "EX", 60);
+      }
+    } catch {}
+
+    res.json(scores);
+
   } catch (err) {
-    if (err?.name === "AbortError") {
-      throw createError(504, "UPSTREAM_TIMEOUT", "Upstream request timed out");
-    }
+    await client.query("ROLLBACK");
     throw err;
   } finally {
-    clearTimeout(timeout);
+    client.release();
   }
-}
+}));
 
-function rankBand(score) {
-  if (score >= 0.85) return "AAA";
-  if (score >= 0.75) return "AA+";
-  if (score >= 0.65) return "AA";
-  if (score >= 0.55) return "A";
-  if (score >= 0.45) return "BBB";
-  return "BB";
-}
+app.post("/ai", auth, asyncHandler(async (req, res) => {
 
-// =======================================
-// WORLD BANK DATA FETCH
-// =======================================
-async function fetchWorldBank() {
-  const url =
-    "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.CD?format=json&per_page=20000";
+  if (!API_KEY) throw createError(500, "AI_NOT_CONFIGURED");
 
-  const data = await fetchJsonWithTimeout(url);
+  const input = JSON.stringify(req.body);
+  if (input.length > 2000) throw createError(400, "INPUT_TOO_LARGE");
 
-  if (!Array.isArray(data) || !Array.isArray(data[1])) {
-    throw createError(502, "INVALID_WORLD_BANK_DATA", "Unexpected World Bank response format");
-  }
-
-  const latestByCountry = new Map();
-
-  for (const row of data[1]) {
-    if (!row || row.value === null || !row.country?.value || !row.country?.id) continue;
-
-    const gdp = Number(row.value);
-    if (!Number.isFinite(gdp)) continue;
-
-    const code = row.country.id;
-    const year = Number.parseInt(row.date, 10) || 0;
-
-    const existing = latestByCountry.get(code);
-
-    if (!existing || year > existing.year) {
-      latestByCountry.set(code, {
-        country: row.country.value,
-        code,
-        gdp,
-        year
-      });
-    }
-  }
-
-  return Array.from(latestByCountry.values()).map(({ country, code, gdp }) => ({
-    country,
-    code,
-    gdp
-  }));
-}
-
-// =======================================
-// MOCK UN / ITU DATA (DEMONSTRATIVE)
-// Replace with validated upstream datasets in production.
-// =======================================
-function fetchUNMock() {
-  return [
-    { code: "IND", governance: 0.65, stability: 0.6, infrastructure: 0.7 },
-    { code: "USA", governance: 0.85, stability: 0.75, infrastructure: 0.9 },
-    { code: "CHN", governance: 0.78, stability: 0.8, infrastructure: 0.88 },
-    { code: "DEU", governance: 0.82, stability: 0.85, infrastructure: 0.87 }
-  ];
-}
-
-// =======================================
-// COMBINED DATA ENGINE
-// =======================================
-async function getCombinedData() {
-  if (cache.combined && Date.now() - cache.timestamp < CACHE_TTL) {
-    return cache.combined;
-  }
-
-  const wb = await fetchWorldBank();
-  const un = fetchUNMock();
-  const unMap = new Map(un.map((item) => [item.code, item]));
-
-  if (!wb.length) {
-    throw createError(502, "EMPTY_WORLD_BANK_DATA", "No World Bank data available");
-  }
-
-  // Log-normalization to reduce extreme GDP skew from outliers
-  const gdpValues = wb.map((d) => Math.log1p(d.gdp));
-  const minGDP = Math.min(...gdpValues);
-  const maxGDP = Math.max(...gdpValues);
-
-  const combined = wb.map((d) => {
-    const match = unMap.get(d.code);
-
-    return {
-      country: d.country,
-      code: d.code,
-      gdp: normalize(Math.log1p(d.gdp), minGDP, maxGDP),
-      governance: boundedUnitValue(match?.governance, 0.5),
-      stability: boundedUnitValue(match?.stability, 0.5),
-      infrastructure: boundedUnitValue(match?.infrastructure, 0.5)
-    };
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      input
+    })
   });
 
-  cache.combined = combined;
-  cache.timestamp = Date.now();
+  if (!response.ok) throw createError(500, "AI_API_FAIL");
 
-  return combined;
-}
+  const data = await response.json();
 
-function buildScores(data) {
-  return data
-    .map((d) => {
-      const score = computeScore(d);
-      return {
-        country: d.country,
-        code: d.code,
-        score: Number(score.toFixed(6)),
-        rankBand: rankBand(score)
-      };
-    })
-    .sort((a, b) => b.score - a.score);
-}
+  await pool.query(
+    `INSERT INTO ai_insights (result,model)
+     VALUES ($1,$2)`,
+    [JSON.stringify(data), "gpt-4o-mini"]
+  );
 
-// =======================================
-// SCORING ENGINE
-// =======================================
-function computeScore(c) {
-  const Cs = boundedUnitValue(c.infrastructure);
-  const Co = boundedUnitValue(c.governance);
-  const Io = boundedUnitValue(c.gdp);
-  const Rs = boundedUnitValue(c.stability);
-  const sigma = 0.3;
+  res.json(data);
+}));
 
-  return Cs * Co * Io * Rs * Math.exp(-sigma);
-}
-
-// =======================================
-// ROUTES — DATA
-// =======================================
-app.get(
-  "/data/worldbank",
-  asyncHandler(async (req, res) => {
-    const data = await fetchWorldBank();
-
-    res.json({
-      source: "World Bank",
-      note: "Latest available GDP per capita record per country (sample first 100).",
-      count: Math.min(data.length, 100),
-      data: data.slice(0, 100)
-    });
-  })
-);
-
-app.get(
-  "/data/combined",
-  asyncHandler(async (req, res) => {
-    const data = await getCombinedData();
-
-    res.json({
-      source: "World Bank + demonstrative governance/stability/infrastructure layer",
-      note: "Combined dataset includes mock supplementary values where no validated upstream layer is configured. GDP is log-normalized to reduce outlier distortion.",
-      count: Math.min(data.length, 100),
-      data: data.slice(0, 100)
-    });
-  })
-);
-
-// =======================================
-// ROUTES — SCORING
-// =======================================
-app.get(
-  "/score/all",
-  asyncHandler(async (req, res) => {
-    const data = await getCombinedData();
-    const scores = buildScores(data);
-
-    res.json({
-      note: "Scores are framework outputs derived from log-normalized GDP and demonstrative supplementary factors.",
-      count: Math.min(scores.length, 100),
-      data: scores.slice(0, 100)
-    });
-  })
-);
-
-app.get(
-  "/score/top/:n",
-  asyncHandler(async (req, res) => {
-    const parsed = Number.parseInt(req.params.n, 10);
-    const n = Number.isFinite(parsed) ? clamp(parsed, 1, MAX_TOP_N) : 10;
-
-    const data = await getCombinedData();
-    const scores = buildScores(data);
-
-    res.json({
-      note: "Top-N framework outputs using log-normalized GDP and demonstrative supplementary layers.",
-      requested: req.params.n,
-      returned: n,
-      data: scores.slice(0, n)
-    });
-  })
-);
-
-// =======================================
-// ROUTE — AI INSIGHT
-// =======================================
-app.post(
-  "/ai",
-  asyncHandler(async (req, res) => {
-    if (!API_KEY) {
-      throw createError(
-        503,
-        "AI_NOT_CONFIGURED",
-        "OPENAI_API_KEY is not configured on the server."
-      );
-    }
-
-    if (!req.is("application/json")) {
-      throw createError(
-        415,
-        "UNSUPPORTED_MEDIA_TYPE",
-        "Content-Type must be application/json"
-      );
-    }
-
-    const risk = boundedUnitValue(req.body?.risk, 0.5);
-    const stability = boundedUnitValue(req.body?.stability, 0.5);
-    const capacity = boundedUnitValue(req.body?.capacity, 0.5);
-    const governance = boundedUnitValue(req.body?.governance, 0.5);
-
-    const prompt = `
-You are evaluating a structured decision profile.
-
-Inputs:
-- Risk: ${risk}
-- Stability: ${stability}
-- Capacity: ${capacity}
-- Governance: ${governance}
-
-Task:
-Provide a concise executive insight in 3-5 sentences.
-Focus on:
-1. risk posture
-2. operational resilience
-3. governance quality
-4. recommended strategic priority
-
-Do not exaggerate. Keep the language professional and neutral.
-`.trim();
-
-    const apiResponse = await fetchJsonWithTimeout(
-      "https://api.openai.com/v1/responses",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          input: prompt,
-          max_output_tokens: 220
-        })
-      },
-      AI_TIMEOUT_MS
-    );
-
-    const result = extractResponseText(apiResponse);
-
-    res.json({
-      result,
-      meta: {
-        model: "gpt-4o-mini",
-        note: "AI insight is a narrative layer and is not identical to the /score/* mathematical ranking engine.",
-        normalizedInputs: {
-          risk,
-          stability,
-          capacity,
-          governance
-        }
-      }
-    });
-  })
-);
-
-// =======================================
-// HEALTH / STATUS
-// =======================================
 app.get("/health", (req, res) => {
   res.json({
-    system: "OMNIVERSE™ DATA CORE",
-    version: "v3.3.1-absolute-lock-final",
-    status: "AVAILABLE",
-    environment: NODE_ENV,
-    aiConfigured: Boolean(API_KEY),
-    cors: {
-      mode: ALLOWED_ORIGINS === "*" ? "wildcard" : "restricted"
-    },
-    cache: {
-      combinedCached: Boolean(cache.combined),
-      cacheAgeMs: cache.timestamp ? Date.now() - cache.timestamp : null
-    }
+    status: "OK",
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    redis: !!redis
   });
 });
 
-app.get("/", (req, res) => {
-  res.json({
-    system: "OMNIVERSE™ DATA CORE",
-    version: "v3.3.1-absolute-lock-final",
-    status: "AVAILABLE",
-    aiConfigured: Boolean(API_KEY),
-    endpoints: [
-      "/health",
-      "/data/worldbank",
-      "/data/combined",
-      "/score/all",
-      "/score/top/:n",
-      "/ai"
-    ]
-  });
-});
-
-// =======================================
-// NOT FOUND
-// =======================================
-app.use((req, res) => {
-  res.status(404).json({
-    error: "NOT_FOUND",
-    message: "The requested endpoint does not exist."
-  });
-});
-
-// =======================================
-// CENTRAL ERROR HANDLER
-// =======================================
-app.use((err, req, res, _next) => {
-  const status = Number.isInteger(err?.status) ? err.status : 500;
-  const code = err?.code || "INTERNAL_SERVER_ERROR";
-
+app.use((err, req, res, next) => {
   if (NODE_ENV !== "production") {
     console.error(err);
   }
-
-  res.status(status).json({
-    error: code,
-    message:
-      status === 500
-        ? "An internal server error occurred."
-        : err.message || "Request failed."
+  res.status(err.status || 500).json({
+    error: err.message || "SERVER_ERROR"
   });
 });
 
-// =======================================
-// START + GRACEFUL SHUTDOWN
-// =======================================
 const server = app.listen(PORT, () => {
-  console.log(`OMNIVERSE™ DATA CORE → http://localhost:${PORT}`);
+  console.log(`OMNIVERSE™ v1 running on ${PORT}`);
 });
 
-let isShuttingDown = false;
+const shutdown = async () => {
+  try {
+    await pool.end();
+    if (redis) await redis.quit();
+  } catch {}
 
-function shutdown(signal) {
-  if (isShuttingDown) return;
-  isShuttingDown = true;
-
-  console.log(`${signal} received. Shutting down OMNIVERSE™ DATA CORE...`);
-
-  server.close((err) => {
-    if (err) {
-      console.error("Error during server shutdown:", err);
-      process.exit(1);
-      return;
-    }
-
-    console.log("Server closed cleanly.");
+  server.close(() => {
     process.exit(0);
   });
 
-  setTimeout(() => {
-    console.error("Forced shutdown after timeout.");
-    process.exit(1);
-  }, SHUTDOWN_TIMEOUT_MS).unref();
-}
+  setTimeout(() => process.exit(1), 5000);
+};
 
-process.on("SIGINT", () => shutdown("SIGINT"));
-process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
