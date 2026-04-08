@@ -16,7 +16,7 @@
     content="OMNIVERSE, AI decision engine, governance scoring, risk evaluation, stability index, strategic intelligence"
   />
 
-  <!-- Social Preview (recommended) -->
+  <!-- Open Graph -->
   <meta property="og:title" content="OMNIVERSE™ — AI Decision Engine" />
   <meta
     property="og:description"
@@ -30,31 +30,31 @@
 <body>
 
   <!-- NAVBAR -->
-  <div class="nav">
+  <nav class="nav" role="navigation" aria-label="Main Navigation">
     <div><b>OMNIVERSE™</b></div>
     <div>
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
       <a href="papers.html">Papers</a>
       <a href="simulator.html">Simulator</a>
-      <a href="ai.html">AI Demo</a>
+      <a href="ai.html" aria-current="page">AI Demo</a>
       <a href="dashboard.html">Dashboard</a>
       <a href="ranking.html">Ranking</a>
     </div>
-  </div>
+  </nav>
 
   <!-- HERO -->
-  <div class="section fade">
+  <main class="section fade">
     <h1>AI Decision Engine</h1>
     <p>
-      A structured computational evaluation interface powered by OMNIVERSE™,
-      designed to assess systemic risk, governance strength, stability,
-      and execution capacity through a demonstrative decision intelligence model.
+      A structured computational evaluation interface powered by OMNIVERSE™, designed
+      to assess systemic risk, governance strength, stability, and execution capacity
+      through a demonstrative decision intelligence model.
     </p>
-  </div>
+  </main>
 
   <!-- ENGINE -->
-  <div class="section fade">
+  <section class="section fade">
     <div class="card">
       <h2>Evaluation Inputs</h2>
 
@@ -76,29 +76,30 @@
 
       <button class="btn" id="runAiBtn" type="button">Run AI Evaluation</button>
 
-      <h2 id="status">Status: Idle</h2>
+      <h2 id="status" aria-live="polite">Status: Idle</h2>
     </div>
-  </div>
+  </section>
 
   <!-- OUTPUT -->
-  <div class="section fade">
+  <section class="section fade">
     <div class="card">
       <h2>AI Output</h2>
       <p id="output">Awaiting evaluation...</p>
     </div>
-  </div>
+  </section>
 
   <!-- SYSTEM NOTE -->
-  <div class="section fade">
+  <section class="section fade">
     <div class="card">
       <h3>Public Note</h3>
       <p>
-        This AI Decision Engine is a demonstrative evaluation module within the OMNIVERSE™
-        framework. Scores, ranks, and insights shown here are prototype analytical outputs
-        intended for research, simulation, and reference modeling unless explicitly stated otherwise.
+        This AI Decision Engine is a demonstrative evaluation module within the OMNIVERSE™ framework.
+        Outputs, scores, ranks, and insights are heuristic and prototype analytical interpretations,
+        intended for research, simulation, and reference modeling only. They do not represent
+        certified, validated, or real-world decision outcomes unless explicitly stated.
       </p>
     </div>
-  </div>
+  </section>
 
   <footer>
     © 2026 Dr. B. Mazumdar — All Rights Reserved
@@ -139,43 +140,12 @@
       }
 
       function classifyScore(score) {
-        if (score >= 0.90) {
-          return {
-            rank: "AAA",
-            badge: "🟢",
-            insight: "Exceptional system strength — highly resilient, strategically balanced, and near sovereign-grade in demonstrative evaluation."
-          };
-        } else if (score >= 0.80) {
-          return {
-            rank: "AA+",
-            badge: "🟢",
-            insight: "High-performing system — strong governance, execution capability, and low structural risk."
-          };
-        } else if (score >= 0.70) {
-          return {
-            rank: "AA",
-            badge: "🟡",
-            insight: "Strong system posture — generally stable with moderate optimization opportunities."
-          };
-        } else if (score >= 0.60) {
-          return {
-            rank: "A",
-            badge: "🟡",
-            insight: "Viable system profile — sound fundamentals with measurable room for structural improvement."
-          };
-        } else if (score >= 0.45) {
-          return {
-            rank: "BBB",
-            badge: "🟠",
-            insight: "Moderate system stability — elevated risk factors and capability gaps should be addressed."
-          };
-        } else {
-          return {
-            rank: "C",
-            badge: "🔴",
-            insight: "High-risk configuration — instability indicators suggest urgent intervention and redesign."
-          };
-        }
+        if (score >= 0.90) return { rank: "AAA", badge: "🟢", insight: "Exceptional system strength — highly resilient and strategically balanced." };
+        if (score >= 0.80) return { rank: "AA+", badge: "🟢", insight: "High-performing system with strong governance and execution capability." };
+        if (score >= 0.70) return { rank: "AA", badge: "🟡", insight: "Strong system posture with moderate optimization opportunities." };
+        if (score >= 0.60) return { rank: "A", badge: "🟡", insight: "Viable system profile with room for structural improvement." };
+        if (score >= 0.45) return { rank: "BBB", badge: "🟠", insight: "Moderate stability with elevated risk factors." };
+        return { rank: "C", badge: "🔴", insight: "High-risk configuration requiring urgent attention." };
       }
 
       function getSliderValue(id) {
@@ -194,11 +164,6 @@
         status.textContent = "Status: Processing...";
         output.textContent = "Running OMNIVERSE™ AI evaluation...";
 
-        /*
-          Demonstrative composite score model:
-          Higher stability, capacity, governance = positive
-          Higher risk = negative
-        */
         const rawScore =
           (stability * 0.30) +
           (capacity * 0.25) +
@@ -207,7 +172,6 @@
 
         const score = clamp(rawScore);
         const { rank, badge, insight } = classifyScore(score);
-
         const percentile = Math.round(score * 100);
 
         const result = `${badge} OMNIVERSE™ AI Evaluation Result
@@ -232,17 +196,16 @@ ${insight}`;
               rank,
               percentile,
               insight,
-              engine: "OMNIVERSE_AI_DEMO_V1"
+              engine: "OMNIVERSE_AI_DEMO_V1",
+              note: "Heuristic prototype output"
             })
           );
-        } catch (error) {
-          console.warn("Unable to save OMNIVERSE result to localStorage:", error);
-        }
+        } catch {}
 
-        window.setTimeout(() => {
+        setTimeout(() => {
           status.textContent = "Status: Completed";
           output.textContent = result;
-        }, 900);
+        }, 800);
       }
 
       bindSliderValues();
