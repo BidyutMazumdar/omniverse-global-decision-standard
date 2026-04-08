@@ -16,10 +16,21 @@
     content="OMNIVERSE, dashboard, global intelligence, decision score, ranking, sovereign analytics"
   />
 
+  <!-- Social Preview (recommended) -->
+  <meta property="og:title" content="OMNIVERSE™ — Global Intelligence Dashboard" />
+  <meta
+    property="og:description"
+    content="Comparative sovereign scoring, demonstrative benchmark analytics, and strategic visualization within the OMNIVERSE™ framework."
+  />
+  <meta property="og:type" content="website" />
+
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js (deferred for clean loading) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+  <!-- Shared site behavior -->
+  <script src="script.js" defer></script>
 </head>
 
 <body>
@@ -106,265 +117,272 @@
     © 2026 Dr. B. Mazumdar — All Rights Reserved
   </footer>
 
-  <script src="script.js"></script>
-
   <script>
     // =========================================================
-    // OMNIVERSE™ DASHBOARD — LOCKED DEMO DATASET
-    // GitHub Pages safe | No backend dependency
+    // OMNIVERSE™ DASHBOARD — TRUE 100% LOCK FINAL
+    // GitHub Pages safe | No backend dependency | Deferred-safe
     // =========================================================
 
-    let globalData = [];
-    let chartInstance = null;
+    document.addEventListener("DOMContentLoaded", () => {
+      let globalData = [];
+      let chartInstance = null;
 
-    // ---------------------------------------------------------
-    // DEMO DATASET (Top benchmark entities)
-    // ISO numeric codes removed for stability (not needed now)
-    // ---------------------------------------------------------
-    const demoData = [
-      { country: "Singapore", score: 0.941 },
-      { country: "Switzerland", score: 0.932 },
-      { country: "Norway", score: 0.921 },
-      { country: "Denmark", score: 0.914 },
-      { country: "Finland", score: 0.906 },
-      { country: "Sweden", score: 0.897 },
-      { country: "Germany", score: 0.889 },
-      { country: "Netherlands", score: 0.881 },
-      { country: "Canada", score: 0.873 },
-      { country: "Japan", score: 0.864 },
-      { country: "Australia", score: 0.856 },
-      { country: "South Korea", score: 0.848 },
-      { country: "United Kingdom", score: 0.839 },
-      { country: "France", score: 0.827 },
-      { country: "New Zealand", score: 0.819 },
-      { country: "United States", score: 0.808 },
-      { country: "United Arab Emirates", score: 0.792 },
-      { country: "Estonia", score: 0.781 },
-      { country: "Ireland", score: 0.774 },
-      { country: "Austria", score: 0.768 },
-      { country: "India", score: 0.742 },
-      { country: "Portugal", score: 0.736 },
-      { country: "Spain", score: 0.729 },
-      { country: "Italy", score: 0.718 },
-      { country: "Poland", score: 0.704 },
-      { country: "Malaysia", score: 0.692 },
-      { country: "Thailand", score: 0.681 },
-      { country: "Brazil", score: 0.663 },
-      { country: "Indonesia", score: 0.651 },
-      { country: "South Africa", score: 0.629 }
-    ];
+      // ---------------------------------------------------------
+      // DEMO DATASET (Top benchmark entities)
+      // ---------------------------------------------------------
+      const demoData = [
+        { country: "Singapore", score: 0.941 },
+        { country: "Switzerland", score: 0.932 },
+        { country: "Norway", score: 0.921 },
+        { country: "Denmark", score: 0.914 },
+        { country: "Finland", score: 0.906 },
+        { country: "Sweden", score: 0.897 },
+        { country: "Germany", score: 0.889 },
+        { country: "Netherlands", score: 0.881 },
+        { country: "Canada", score: 0.873 },
+        { country: "Japan", score: 0.864 },
+        { country: "Australia", score: 0.856 },
+        { country: "South Korea", score: 0.848 },
+        { country: "United Kingdom", score: 0.839 },
+        { country: "France", score: 0.827 },
+        { country: "New Zealand", score: 0.819 },
+        { country: "United States", score: 0.808 },
+        { country: "United Arab Emirates", score: 0.792 },
+        { country: "Estonia", score: 0.781 },
+        { country: "Ireland", score: 0.774 },
+        { country: "Austria", score: 0.768 },
+        { country: "India", score: 0.742 },
+        { country: "Portugal", score: 0.736 },
+        { country: "Spain", score: 0.729 },
+        { country: "Italy", score: 0.718 },
+        { country: "Poland", score: 0.704 },
+        { country: "Malaysia", score: 0.692 },
+        { country: "Thailand", score: 0.681 },
+        { country: "Brazil", score: 0.663 },
+        { country: "Indonesia", score: 0.651 },
+        { country: "South Africa", score: 0.629 }
+      ];
 
-    // ---------------------------------------------------------
-    // HELPERS
-    // ---------------------------------------------------------
-    function clamp(value) {
-      return Math.max(0, Math.min(1, value));
-    }
-
-    function getRank(score) {
-      if (score >= 0.90) return "AAA";
-      if (score >= 0.80) return "AA+";
-      if (score >= 0.70) return "AA";
-      if (score >= 0.60) return "A";
-      if (score >= 0.45) return "BBB";
-      return "C";
-    }
-
-    function getBand(score) {
-      if (score >= 0.90) return "Elite";
-      if (score >= 0.80) return "High";
-      if (score >= 0.70) return "Strong";
-      if (score >= 0.60) return "Stable";
-      if (score >= 0.45) return "Moderate";
-      return "Critical";
-    }
-
-    function getHeatClass(score) {
-      if (score >= 0.90) return "heat heat-elite";
-      if (score >= 0.80) return "heat heat-high";
-      if (score >= 0.70) return "heat heat-strong";
-      if (score >= 0.60) return "heat heat-stable";
-      if (score >= 0.45) return "heat heat-moderate";
-      return "heat heat-critical";
-    }
-
-    // ---------------------------------------------------------
-    // LOAD DATA
-    // Strategy:
-    // 1) Use locked demo dataset
-    // 2) If ai.html localStorage exists, inject "Your Model"
-    // ---------------------------------------------------------
-    function loadData() {
-      const status = document.getElementById("systemStatus");
-      globalData = [...demoData];
-
-      try {
-        const saved = localStorage.getItem("omniverse_result");
-
-        if (saved) {
-          const parsed = JSON.parse(saved);
-
-          if (typeof parsed.score === "number") {
-            const userEntry = {
-              country: "Your Model",
-              score: clamp(parsed.score),
-              isUser: true,
-              rank: parsed.rank || getRank(parsed.score)
-            };
-
-            globalData.push(userEntry);
-          }
-        }
-
-        // sort descending
-        globalData.sort((a, b) => b.score - a.score);
-
-        renderUserResult();
-        renderRanking();
-        renderChart();
-        renderHeatGrid();
-
-        status.textContent = "System Status: Active — Demo dataset loaded successfully.";
-      } catch (error) {
-        console.error(error);
-
-        globalData = [...demoData].sort((a, b) => b.score - a.score);
-
-        renderUserResult(true);
-        renderRanking();
-        renderChart();
-        renderHeatGrid();
-
-        status.textContent = "System Status: Active — Fallback mode enabled.";
+      // ---------------------------------------------------------
+      // HELPERS
+      // ---------------------------------------------------------
+      function clamp(value) {
+        return Math.max(0, Math.min(1, value));
       }
-    }
 
-    // ---------------------------------------------------------
-    // USER RESULT
-    // ---------------------------------------------------------
-    function renderUserResult(fallback = false) {
-      const box = document.getElementById("userResult");
+      function getRank(score) {
+        if (score >= 0.90) return "AAA";
+        if (score >= 0.80) return "AA+";
+        if (score >= 0.70) return "AA";
+        if (score >= 0.60) return "A";
+        if (score >= 0.45) return "BBB";
+        return "C";
+      }
 
-      try {
-        const saved = localStorage.getItem("omniverse_result");
+      function getBand(score) {
+        if (score >= 0.90) return "Elite";
+        if (score >= 0.80) return "High";
+        if (score >= 0.70) return "Strong";
+        if (score >= 0.60) return "Stable";
+        if (score >= 0.45) return "Moderate";
+        return "Critical";
+      }
 
-        if (!saved) {
-          box.textContent = "No AI evaluation found yet. Run the AI Demo first to compare your model against benchmark entities.";
+      function getHeatClass(score) {
+        if (score >= 0.90) return "heat heat-elite";
+        if (score >= 0.80) return "heat heat-high";
+        if (score >= 0.70) return "heat heat-strong";
+        if (score >= 0.60) return "heat heat-stable";
+        if (score >= 0.45) return "heat heat-moderate";
+        return "heat heat-critical";
+      }
+
+      // ---------------------------------------------------------
+      // USER RESULT
+      // ---------------------------------------------------------
+      function renderUserResult(fallback = false) {
+        const box = document.getElementById("userResult");
+        if (!box) return;
+
+        try {
+          const saved = localStorage.getItem("omniverse_result");
+
+          if (!saved) {
+            box.textContent = "No AI evaluation found yet. Run the AI Demo first to compare your model against benchmark entities.";
+            return;
+          }
+
+          const parsed = JSON.parse(saved);
+          const score = clamp(parsed.score || 0);
+          const rank = parsed.rank || getRank(score);
+          const percentile = parsed.percentile || Math.round(score * 100);
+          const insight = parsed.insight || "Benchmark comparison available.";
+
+          box.textContent =
+            `Score: ${score.toFixed(3)} | Rank: ${rank} | Percentile: ${percentile}% | ${insight}`;
+        } catch {
+          box.textContent = fallback
+            ? "AI result could not be read. Dashboard is running in fallback mode."
+            : "AI result unavailable.";
+        }
+      }
+
+      // ---------------------------------------------------------
+      // RANKING
+      // ---------------------------------------------------------
+      function renderRanking() {
+        const list = document.getElementById("ranking");
+        if (!list) return;
+
+        list.innerHTML = "";
+
+        globalData.slice(0, 20).forEach((d, i) => {
+          const li = document.createElement("li");
+          const rank = d.rank || getRank(d.score);
+          const marker = d.isUser ? " ★" : "";
+          li.textContent = `${i + 1}. ${d.country} — ${d.score.toFixed(3)} (${rank})${marker}`;
+          list.appendChild(li);
+        });
+      }
+
+      // ---------------------------------------------------------
+      // BAR CHART
+      // ---------------------------------------------------------
+      function renderChart() {
+        const top = globalData.slice(0, 20);
+        const canvas = document.getElementById("analytics");
+
+        if (!canvas || typeof Chart === "undefined") {
           return;
         }
 
-        const parsed = JSON.parse(saved);
-        const score = clamp(parsed.score || 0);
-        const rank = parsed.rank || getRank(score);
-        const percentile = parsed.percentile || Math.round(score * 100);
-        const insight = parsed.insight || "Benchmark comparison available.";
+        if (chartInstance) {
+          chartInstance.destroy();
+        }
 
-        box.textContent =
-          `Score: ${score.toFixed(3)} | Rank: ${rank} | Percentile: ${percentile}% | ${insight}`;
-      } catch {
-        box.textContent = fallback
-          ? "AI result could not be read. Dashboard is running in fallback mode."
-          : "AI result unavailable.";
-      }
-    }
-
-    // ---------------------------------------------------------
-    // RANKING
-    // ---------------------------------------------------------
-    function renderRanking() {
-      const list = document.getElementById("ranking");
-      list.innerHTML = "";
-
-      globalData.slice(0, 20).forEach((d, i) => {
-        const li = document.createElement("li");
-        const rank = d.rank || getRank(d.score);
-        const marker = d.isUser ? " ★" : "";
-        li.textContent = `${i + 1}. ${d.country} — ${d.score.toFixed(3)} (${rank})${marker}`;
-        list.appendChild(li);
-      });
-    }
-
-    // ---------------------------------------------------------
-    // BAR CHART
-    // ---------------------------------------------------------
-    function renderChart() {
-      const top = globalData.slice(0, 20);
-      const ctx = document.getElementById("analytics");
-
-      if (chartInstance) {
-        chartInstance.destroy();
-      }
-
-      chartInstance = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: top.map(d => d.country),
-          datasets: [{
-            label: "Decision Score",
-            data: top.map(d => d.score),
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: true
+        chartInstance = new Chart(canvas, {
+          type: "bar",
+          data: {
+            labels: top.map(d => d.country),
+            datasets: [{
+              label: "Decision Score",
+              data: top.map(d => d.score),
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const score = context.raw;
+                    return ` Score: ${Number(score).toFixed(3)} | Rank: ${getRank(score)}`;
+                  }
+                }
+              }
             },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  const score = context.raw;
-                  return ` Score: ${Number(score).toFixed(3)} | Rank: ${getRank(score)}`;
+            scales: {
+              y: {
+                min: 0,
+                max: 1,
+                ticks: {
+                  stepSize: 0.1
                 }
               }
             }
-          },
-          scales: {
-            y: {
-              min: 0,
-              max: 1,
-              ticks: {
-                stepSize: 0.1
-              }
+          }
+        });
+      }
+
+      // ---------------------------------------------------------
+      // SAFE GLOBAL HEAT GRID
+      // ---------------------------------------------------------
+      function renderHeatGrid() {
+        const grid = document.getElementById("heatGrid");
+        if (!grid) return;
+
+        grid.innerHTML = "";
+
+        globalData.slice(0, 30).forEach((d) => {
+          const item = document.createElement("div");
+          item.className = getHeatClass(d.score);
+
+          const rank = d.rank || getRank(d.score);
+          const band = getBand(d.score);
+          const star = d.isUser ? " ★" : "";
+
+          item.innerHTML = `
+            <strong>${d.country}${star}</strong><br>
+            Score: ${d.score.toFixed(3)}<br>
+            Rank: ${rank}<br>
+            Band: ${band}
+          `;
+
+          grid.appendChild(item);
+        });
+      }
+
+      // ---------------------------------------------------------
+      // LOAD DATA
+      // ---------------------------------------------------------
+      function loadData() {
+        const status = document.getElementById("systemStatus");
+        globalData = [...demoData];
+
+        try {
+          const saved = localStorage.getItem("omniverse_result");
+
+          if (saved) {
+            const parsed = JSON.parse(saved);
+
+            if (typeof parsed.score === "number") {
+              const userEntry = {
+                country: "Your Model",
+                score: clamp(parsed.score),
+                isUser: true,
+                rank: parsed.rank || getRank(parsed.score)
+              };
+
+              globalData.push(userEntry);
             }
           }
+
+          globalData.sort((a, b) => b.score - a.score);
+
+          renderUserResult();
+          renderRanking();
+          renderChart();
+          renderHeatGrid();
+
+          if (status) {
+            status.textContent = "System Status: Active — Demo dataset loaded successfully.";
+          }
+        } catch (error) {
+          console.error("Dashboard fallback mode:", error);
+
+          globalData = [...demoData].sort((a, b) => b.score - a.score);
+
+          renderUserResult(true);
+          renderRanking();
+          renderChart();
+          renderHeatGrid();
+
+          if (status) {
+            status.textContent = "System Status: Active — Fallback mode enabled.";
+          }
         }
-      });
-    }
+      }
 
-    // ---------------------------------------------------------
-    // SAFE GLOBAL HEAT GRID
-    // (Replaces unstable choropleth dependency for GitHub Pages)
-    // ---------------------------------------------------------
-    function renderHeatGrid() {
-      const grid = document.getElementById("heatGrid");
-      grid.innerHTML = "";
-
-      globalData.slice(0, 30).forEach((d) => {
-        const item = document.createElement("div");
-        item.className = getHeatClass(d.score);
-
-        const rank = d.rank || getRank(d.score);
-        const band = getBand(d.score);
-        const star = d.isUser ? " ★" : "";
-
-        item.innerHTML = `
-          <strong>${d.country}${star}</strong><br>
-          Score: ${d.score.toFixed(3)}<br>
-          Rank: ${rank}<br>
-          Band: ${band}
-        `;
-
-        grid.appendChild(item);
-      });
-    }
-
-    // ---------------------------------------------------------
-    // INIT
-    // ---------------------------------------------------------
-    window.addEventListener("load", loadData);
+      // ---------------------------------------------------------
+      // INIT
+      // ---------------------------------------------------------
+      loadData();
+    });
   </script>
 
 </body>
