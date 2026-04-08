@@ -1,5 +1,5 @@
 // =======================================
-// OMNIVERSE™ AI + DATA SERVER — v3.2.0 LOCK FINAL
+// OMNIVERSE™ AI + DATA SERVER — v3.3.1 ABSOLUTE LOCK FINAL
 // Production-Safe • Claims-Safe • ESM Compatible • Render/Railway/Node 18+ Ready
 // Canonical Release
 // =======================================
@@ -19,21 +19,33 @@ const app = express();
 // =======================================
 const PORT = Number.parseInt(process.env.PORT, 10) || 3000;
 const API_KEY = process.env.OPENAI_API_KEY || "";
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
 const NODE_ENV = process.env.NODE_ENV || "development";
 
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 const FETCH_TIMEOUT_MS = 15000;
 const AI_TIMEOUT_MS = 30000;
 const MAX_TOP_N = 100;
+const SHUTDOWN_TIMEOUT_MS = 10000;
 
 // =======================================
-// STARTUP VALIDATION
+// CORS CONFIG
+// Supports:
+//   ALLOWED_ORIGIN=*
+//   ALLOWED_ORIGIN=https://example.com
+//   ALLOWED_ORIGIN=https://a.com,https://b.com
 // =======================================
-if (!API_KEY) {
-  console.error("FATAL: OPENAI_API_KEY is missing");
-  process.exit(1);
+function parseAllowedOrigins(value) {
+  if (!value || value.trim() === "*") return "*";
+
+  const list = value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  return list.length ? list : "*";
 }
+
+const ALLOWED_ORIGINS = parseAllowedOrigins(process.env.ALLOWED_ORIGIN || "*");
 
 // =======================================
 // SECURITY LAYER
@@ -49,7 +61,20 @@ app.use(
 
 app.use(
   cors({
-    origin: ALLOWED_ORIGIN === "*" ? true : ALLOWED_ORIGIN,
+    origin(origin, callback) {
+      // Allow server-to-server tools / curl / Postman / same-origin requests without Origin header
+      if (!origin) return callback(null, true);
+
+      if (ALLOWED_ORIGINS === "*") {
+        return callback(null, true);
+      }
+
+      if (Array.isArray(ALLOWED_ORIGINS) && ALLOWED_ORIGINS.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(createError(403, "CORS_BLOCKED", "Origin not allowed by CORS policy"));
+    },
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
   })
@@ -377,6 +402,14 @@ app.get(
 app.post(
   "/ai",
   asyncHandler(async (req, res) => {
+    if (!API_KEY) {
+      throw createError(
+        503,
+        "AI_NOT_CONFIGURED",
+        "OPENAI_API_KEY is not configured on the server."
+      );
+    }
+
     if (!req.is("application/json")) {
       throw createError(
         415,
@@ -451,9 +484,13 @@ Do not exaggerate. Keep the language professional and neutral.
 app.get("/health", (req, res) => {
   res.json({
     system: "OMNIVERSE™ DATA CORE",
-    version: "v3.2.0-lock-final",
+    version: "v3.3.1-absolute-lock-final",
     status: "AVAILABLE",
     environment: NODE_ENV,
+    aiConfigured: Boolean(API_KEY),
+    cors: {
+      mode: ALLOWED_ORIGINS === "*" ? "wildcard" : "restricted"
+    },
     cache: {
       combinedCached: Boolean(cache.combined),
       cacheAgeMs: cache.timestamp ? Date.now() - cache.timestamp : null
@@ -464,8 +501,9 @@ app.get("/health", (req, res) => {
 app.get("/", (req, res) => {
   res.json({
     system: "OMNIVERSE™ DATA CORE",
-    version: "v3.2.0-lock-final",
+    version: "v3.3.1-absolute-lock-final",
     status: "AVAILABLE",
+    aiConfigured: Boolean(API_KEY),
     endpoints: [
       "/health",
       "/data/worldbank",
@@ -490,7 +528,7 @@ app.use((req, res) => {
 // =======================================
 // CENTRAL ERROR HANDLER
 // =======================================
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   const status = Number.isInteger(err?.status) ? err.status : 500;
   const code = err?.code || "INTERNAL_SERVER_ERROR";
 
@@ -508,8 +546,36 @@ app.use((err, req, res, next) => {
 });
 
 // =======================================
-// START
+// START + GRACEFUL SHUTDOWN
 // =======================================
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`OMNIVERSE™ DATA CORE → http://localhost:${PORT}`);
 });
+
+let isShuttingDown = false;
+
+function shutdown(signal) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  console.log(`${signal} received. Shutting down OMNIVERSE™ DATA CORE...`);
+
+  server.close((err) => {
+    if (err) {
+      console.error("Error during server shutdown:", err);
+      process.exit(1);
+      return;
+    }
+
+    console.log("Server closed cleanly.");
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    console.error("Forced shutdown after timeout.");
+    process.exit(1);
+  }, SHUTDOWN_TIMEOUT_MS).unref();
+}
+
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
