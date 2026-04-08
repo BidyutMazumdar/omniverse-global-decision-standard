@@ -13,11 +13,19 @@
   />
   <meta name="author" content="Dr. B. Mazumdar" />
 
+  <!-- Social Preview -->
+  <meta property="og:title" content="OMNIVERSE™ Simulator" />
+  <meta
+    property="og:description"
+    content="OMNIVERSE™ Adoption Readiness Simulator — interactive quantitative decision modeling demonstration."
+  />
+  <meta property="og:type" content="website" />
+
   <!-- External CSS -->
   <link rel="stylesheet" href="style.css" />
 
   <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 </head>
 <body>
   <!-- NAVBAR -->
@@ -30,6 +38,7 @@
       <a href="simulator.html" aria-current="page">Simulator</a>
       <a href="ai.html">AI Demo</a>
       <a href="dashboard.html">Dashboard</a>
+      <a href="ranking.html">Ranking</a>
     </div>
   </div>
 
@@ -75,10 +84,7 @@
     </div>
   </div>
 
-  <!-- OPTIONAL external script.js
-       Safe to keep even if file missing? NO.
-       So removed intentionally for 100% lock single-file stability.
-  -->
+  <script src="script.js" defer></script>
 
   <script>
     "use strict";
