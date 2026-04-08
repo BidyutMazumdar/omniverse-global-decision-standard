@@ -16,27 +16,25 @@
     content="OMNIVERSE, dashboard, global intelligence, decision score, ranking, sovereign analytics"
   />
 
-  <!-- Social Preview (recommended) -->
+  <!-- Open Graph -->
   <meta property="og:title" content="OMNIVERSE™ — Global Intelligence Dashboard" />
   <meta
     property="og:description"
-    content="Comparative sovereign scoring, demonstrative benchmark analytics, and strategic visualization within the OMNIVERSE™ framework."
+    content="Comparative benchmark analytics and strategic visualization within the OMNIVERSE™ framework."
   />
   <meta property="og:type" content="website" />
 
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Chart.js (deferred for clean loading) -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-
-  <!-- Shared site behavior -->
   <script src="script.js" defer></script>
 </head>
 
 <body>
 
   <!-- NAVBAR -->
-  <div class="nav">
+  <nav class="nav" role="navigation" aria-label="Main Navigation">
     <div><b>OMNIVERSE™</b></div>
     <div>
       <a href="index.html">Home</a>
@@ -44,92 +42,87 @@
       <a href="papers.html">Papers</a>
       <a href="simulator.html">Simulator</a>
       <a href="ai.html">AI Demo</a>
-      <a href="dashboard.html">Dashboard</a>
+      <a href="dashboard.html" aria-current="page">Dashboard</a>
       <a href="ranking.html">Ranking</a>
     </div>
-  </div>
+  </nav>
 
   <!-- HEADER -->
-  <div class="section fade">
+  <main class="section fade">
     <h1>Global Intelligence Dashboard</h1>
     <p>
       A demonstrative strategic analytics interface presenting comparative decision scores,
-      ranking intelligence, and global benchmark visualization within the OMNIVERSE™ framework.
+      ranking intelligence, and benchmark visualization within the OMNIVERSE™ framework.
     </p>
-  </div>
+  </main>
 
-  <!-- STATUS CARD -->
-  <div class="section fade">
+  <!-- STATUS -->
+  <section class="section fade">
     <div class="card">
       <h2>System Status</h2>
-      <p id="systemStatus">Initializing dashboard...</p>
+      <p id="systemStatus" aria-live="polite">Initializing dashboard...</p>
     </div>
-  </div>
+  </section>
 
   <!-- USER RESULT -->
-  <div class="section fade">
+  <section class="section fade">
     <div class="card">
       <h2>Your Latest OMNIVERSE™ AI Result</h2>
       <p id="userResult">No AI evaluation found yet. Run the AI Demo first.</p>
     </div>
-  </div>
+  </section>
 
-  <!-- GLOBAL HEAT GRID (SAFE MAP ALTERNATIVE) -->
-  <div class="section fade">
+  <!-- HEAT GRID -->
+  <section class="section fade">
     <div class="card">
       <h2>Global Benchmark Heat Grid</h2>
       <p>
-        Demonstrative global distribution of benchmark decision scores across selected sovereign entities.
+        Demonstrative benchmark distribution across selected entities (non-official dataset).
       </p>
       <div id="heatGrid" class="heat-grid"></div>
     </div>
-  </div>
+  </section>
 
   <!-- ANALYTICS -->
-  <div class="section fade">
+  <section class="section fade">
     <div class="card">
       <h2>Top 20 Decision Scores</h2>
-      <canvas id="analytics"></canvas>
+      <canvas id="analytics" aria-label="Top decision scores chart" role="img"></canvas>
     </div>
-  </div>
+  </section>
 
   <!-- RANKING -->
-  <div class="section fade">
+  <section class="section fade">
     <div class="card">
       <h2>Global Ranking</h2>
       <ol id="ranking"></ol>
     </div>
-  </div>
+  </section>
 
   <!-- PUBLIC NOTE -->
-  <div class="section fade">
+  <section class="section fade">
     <div class="card">
       <h3>Public Note</h3>
       <p>
         This dashboard presents demonstrative benchmark analytics within the OMNIVERSE™ ecosystem.
-        Unless explicitly stated otherwise, all displayed rankings, scores, and comparative outputs
-        are prototype simulation references for research, presentation, and conceptual modeling.
+        All displayed rankings, scores, and comparative outputs are prototype simulation references
+        based on non-validated and partially synthetic datasets, intended strictly for research,
+        presentation, and conceptual modeling purposes.
       </p>
     </div>
-  </div>
+  </section>
 
   <footer>
     © 2026 Dr. B. Mazumdar — All Rights Reserved
   </footer>
 
   <script>
-    // =========================================================
-    // OMNIVERSE™ DASHBOARD — TRUE 100% LOCK FINAL
-    // GitHub Pages safe | No backend dependency | Deferred-safe
-    // =========================================================
-
     document.addEventListener("DOMContentLoaded", () => {
+
       let globalData = [];
       let chartInstance = null;
 
-      // ---------------------------------------------------------
-      // DEMO DATASET (Top benchmark entities)
-      // ---------------------------------------------------------
+      // ---------------- DEMO DATA ----------------
       const demoData = [
         { country: "Singapore", score: 0.941 },
         { country: "Switzerland", score: 0.932 },
@@ -150,238 +143,99 @@
         { country: "United Arab Emirates", score: 0.792 },
         { country: "Estonia", score: 0.781 },
         { country: "Ireland", score: 0.774 },
-        { country: "Austria", score: 0.768 },
-        { country: "India", score: 0.742 },
-        { country: "Portugal", score: 0.736 },
-        { country: "Spain", score: 0.729 },
-        { country: "Italy", score: 0.718 },
-        { country: "Poland", score: 0.704 },
-        { country: "Malaysia", score: 0.692 },
-        { country: "Thailand", score: 0.681 },
-        { country: "Brazil", score: 0.663 },
-        { country: "Indonesia", score: 0.651 },
-        { country: "South Africa", score: 0.629 }
+        { country: "Austria", score: 0.768 }
       ];
 
-      // ---------------------------------------------------------
-      // HELPERS
-      // ---------------------------------------------------------
-      function clamp(value) {
-        return Math.max(0, Math.min(1, value));
-      }
+      // ---------------- HELPERS ----------------
+      const clamp = v => Math.max(0, Math.min(1, v));
 
-      function getRank(score) {
-        if (score >= 0.90) return "AAA";
-        if (score >= 0.80) return "AA+";
-        if (score >= 0.70) return "AA";
-        if (score >= 0.60) return "A";
-        if (score >= 0.45) return "BBB";
-        return "C";
-      }
+      const getRank = s =>
+        s >= 0.90 ? "AAA" :
+        s >= 0.80 ? "AA+" :
+        s >= 0.70 ? "AA" :
+        s >= 0.60 ? "A" :
+        s >= 0.45 ? "BBB" : "C";
 
-      function getBand(score) {
-        if (score >= 0.90) return "Elite";
-        if (score >= 0.80) return "High";
-        if (score >= 0.70) return "Strong";
-        if (score >= 0.60) return "Stable";
-        if (score >= 0.45) return "Moderate";
-        return "Critical";
-      }
+      const getHeatClass = s =>
+        s >= 0.90 ? "heat heat-elite" :
+        s >= 0.80 ? "heat heat-high" :
+        s >= 0.70 ? "heat heat-strong" :
+        s >= 0.60 ? "heat heat-stable" :
+        s >= 0.45 ? "heat heat-moderate" : "heat heat-critical";
 
-      function getHeatClass(score) {
-        if (score >= 0.90) return "heat heat-elite";
-        if (score >= 0.80) return "heat heat-high";
-        if (score >= 0.70) return "heat heat-strong";
-        if (score >= 0.60) return "heat heat-stable";
-        if (score >= 0.45) return "heat heat-moderate";
-        return "heat heat-critical";
-      }
-
-      // ---------------------------------------------------------
-      // USER RESULT
-      // ---------------------------------------------------------
-      function renderUserResult(fallback = false) {
-        const box = document.getElementById("userResult");
-        if (!box) return;
+      // ---------------- USER ----------------
+      function renderUser() {
+        const el = document.getElementById("userResult");
+        if (!el) return;
 
         try {
-          const saved = localStorage.getItem("omniverse_result");
+          const saved = JSON.parse(localStorage.getItem("omniverse_result"));
 
           if (!saved) {
-            box.textContent = "No AI evaluation found yet. Run the AI Demo first to compare your model against benchmark entities.";
+            el.textContent = "No AI evaluation found yet. Run the AI Demo first.";
             return;
           }
 
-          const parsed = JSON.parse(saved);
-          const score = clamp(parsed.score || 0);
-          const rank = parsed.rank || getRank(score);
-          const percentile = parsed.percentile || Math.round(score * 100);
-          const insight = parsed.insight || "Benchmark comparison available.";
-
-          box.textContent =
-            `Score: ${score.toFixed(3)} | Rank: ${rank} | Percentile: ${percentile}% | ${insight}`;
+          el.textContent =
+            `Score: ${saved.score.toFixed(3)} | Rank: ${saved.rank} | ${saved.insight}`;
         } catch {
-          box.textContent = fallback
-            ? "AI result could not be read. Dashboard is running in fallback mode."
-            : "AI result unavailable.";
+          el.textContent = "AI result unavailable.";
         }
       }
 
-      // ---------------------------------------------------------
-      // RANKING
-      // ---------------------------------------------------------
-      function renderRanking() {
-        const list = document.getElementById("ranking");
-        if (!list) return;
-
-        list.innerHTML = "";
-
-        globalData.slice(0, 20).forEach((d, i) => {
-          const li = document.createElement("li");
-          const rank = d.rank || getRank(d.score);
-          const marker = d.isUser ? " ★" : "";
-          li.textContent = `${i + 1}. ${d.country} — ${d.score.toFixed(3)} (${rank})${marker}`;
-          list.appendChild(li);
-        });
-      }
-
-      // ---------------------------------------------------------
-      // BAR CHART
-      // ---------------------------------------------------------
+      // ---------------- CHART ----------------
       function renderChart() {
-        const top = globalData.slice(0, 20);
         const canvas = document.getElementById("analytics");
+        if (!canvas || typeof Chart === "undefined") return;
 
-        if (!canvas || typeof Chart === "undefined") {
-          return;
-        }
-
-        if (chartInstance) {
-          chartInstance.destroy();
-        }
+        if (chartInstance) chartInstance.destroy();
 
         chartInstance = new Chart(canvas, {
           type: "bar",
           data: {
-            labels: top.map(d => d.country),
+            labels: globalData.map(d => d.country),
             datasets: [{
               label: "Decision Score",
-              data: top.map(d => d.score),
+              data: globalData.map(d => d.score),
               borderWidth: 1
             }]
           },
           options: {
             responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: true
-              },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    const score = context.raw;
-                    return ` Score: ${Number(score).toFixed(3)} | Rank: ${getRank(score)}`;
-                  }
-                }
-              }
-            },
-            scales: {
-              y: {
-                min: 0,
-                max: 1,
-                ticks: {
-                  stepSize: 0.1
-                }
-              }
-            }
+            scales: { y: { min: 0, max: 1 } }
           }
         });
       }
 
-      // ---------------------------------------------------------
-      // SAFE GLOBAL HEAT GRID
-      // ---------------------------------------------------------
-      function renderHeatGrid() {
-        const grid = document.getElementById("heatGrid");
-        if (!grid) return;
-
-        grid.innerHTML = "";
-
-        globalData.slice(0, 30).forEach((d) => {
-          const item = document.createElement("div");
-          item.className = getHeatClass(d.score);
-
-          const rank = d.rank || getRank(d.score);
-          const band = getBand(d.score);
-          const star = d.isUser ? " ★" : "";
-
-          item.innerHTML = `
-            <strong>${d.country}${star}</strong><br>
-            Score: ${d.score.toFixed(3)}<br>
-            Rank: ${rank}<br>
-            Band: ${band}
-          `;
-
-          grid.appendChild(item);
-        });
-      }
-
-      // ---------------------------------------------------------
-      // LOAD DATA
-      // ---------------------------------------------------------
-      function loadData() {
+      // ---------------- INIT ----------------
+      function init() {
         const status = document.getElementById("systemStatus");
+
         globalData = [...demoData];
 
         try {
-          const saved = localStorage.getItem("omniverse_result");
-
-          if (saved) {
-            const parsed = JSON.parse(saved);
-
-            if (typeof parsed.score === "number") {
-              const userEntry = {
-                country: "Your Model",
-                score: clamp(parsed.score),
-                isUser: true,
-                rank: parsed.rank || getRank(parsed.score)
-              };
-
-              globalData.push(userEntry);
-            }
+          const saved = JSON.parse(localStorage.getItem("omniverse_result"));
+          if (saved && typeof saved.score === "number") {
+            globalData.push({
+              country: "Your Model",
+              score: clamp(saved.score),
+              rank: saved.rank,
+              isUser: true
+            });
           }
 
           globalData.sort((a, b) => b.score - a.score);
 
-          renderUserResult();
-          renderRanking();
+          renderUser();
           renderChart();
-          renderHeatGrid();
 
-          if (status) {
-            status.textContent = "System Status: Active — Demo dataset loaded successfully.";
-          }
-        } catch (error) {
-          console.error("Dashboard fallback mode:", error);
-
-          globalData = [...demoData].sort((a, b) => b.score - a.score);
-
-          renderUserResult(true);
-          renderRanking();
-          renderChart();
-          renderHeatGrid();
-
-          if (status) {
-            status.textContent = "System Status: Active — Fallback mode enabled.";
-          }
+          status.textContent = "System Status: Active — Demonstrative dataset loaded.";
+        } catch {
+          status.textContent = "System Status: Active — Fallback mode.";
         }
       }
 
-      // ---------------------------------------------------------
-      // INIT
-      // ---------------------------------------------------------
-      loadData();
+      init();
     });
   </script>
 
