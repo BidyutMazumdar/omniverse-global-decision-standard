@@ -6,6 +6,10 @@
 
 <title>OMNIVERSE™ Simulator</title>
 
+<!-- SEO -->
+<meta name="description" content="OMNIVERSE™ Adoption Readiness Simulator — Quantitative Decision Modeling Platform">
+<meta name="author" content="Dr. B. Mazumdar">
+
 <link rel="stylesheet" href="style.css">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,12 +27,14 @@
         <a href="papers.html">Papers</a>
         <a href="simulator.html">Simulator</a>
         <a href="ai.html">AI Demo</a>
+        <a href="dashboard.html">Dashboard</a>
     </div>
 </div>
 
 <!-- TITLE -->
 <div class="section fade">
     <h1>Adoption Readiness Simulator</h1>
+    <p>Dynamic evaluation of system adoption based on multi-variable governance metrics.</p>
 </div>
 
 <!-- SLIDERS -->
@@ -66,28 +72,39 @@
 
 <script>
 
-// Initialize Chart
-const ctx = document.getElementById('chart').getContext('2d');
+// ===============================
+// CHART INIT (SAFE)
+// ===============================
+const canvas = document.getElementById("chart");
+let chart;
 
-let chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [{
-            label: 'Ad vs σt',
-            data: [],
-            fill: false,
-            tension: 0.3
-        }]
-    }
-});
+if (canvas) {
+    const ctx = canvas.getContext("2d");
 
-// Calculation Function
+    chart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [{
+                label: "Ad vs σt",
+                data: [],
+                fill: false,
+                tension: 0.3
+            }]
+        }
+    });
+}
+
+// ===============================
+// CORE MODEL
+// ===============================
 function calculateAd(Cs, Co, Io, Rs, sigma) {
     return (Cs * Co * Io * Rs) * Math.exp(-sigma);
 }
 
-// Update System
+// ===============================
+// UPDATE SYSTEM
+// ===============================
 function update() {
 
     let Cs = +document.getElementById("Cs").value;
@@ -98,10 +115,10 @@ function update() {
 
     let Ad = calculateAd(Cs, Co, Io, Rs, sigma);
 
-    // Update result
     document.getElementById("result").innerText = "Ad = " + Ad.toFixed(4);
 
-    // Generate curve
+    if (!chart) return;
+
     let labels = [];
     let data = [];
 
@@ -115,13 +132,17 @@ function update() {
     chart.update();
 }
 
-// Event Listeners
-document.querySelectorAll("input").forEach(el => {
-    el.addEventListener("input", update);
-});
+// ===============================
+// EVENT LISTENERS (SAFE INIT)
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
 
-// Initial run
-window.onload = update;
+    document.querySelectorAll("input").forEach(el => {
+        el.addEventListener("input", update);
+    });
+
+    update(); // initial run
+});
 
 </script>
 
