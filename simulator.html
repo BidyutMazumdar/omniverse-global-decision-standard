@@ -71,6 +71,7 @@
       <div class="card">
         <h2>Volatility Sensitivity</h2>
         <canvas id="chart"></canvas>
+        <p id="chartFallback" style="display:none;">Chart unavailable</p>
       </div>
     </section>
 
@@ -81,15 +82,17 @@
 
 function byId(id){ return document.getElementById(id); }
 
+function safeNum(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+
 function clamp(v,min,max){ return Math.min(Math.max(v,min),max); }
 
 function getInputs(){
   return {
-    Cs: +byId("Cs").value,
-    Co: +byId("Co").value,
-    Io: +byId("Io").value,
-    Rs: +byId("Rs").value,
-    sigma: +byId("sigma").value
+    Cs: clamp(safeNum(byId("Cs")?.value),0,1),
+    Co: clamp(safeNum(byId("Co")?.value),0,1),
+    Io: clamp(safeNum(byId("Io")?.value),0,1),
+    Rs: clamp(safeNum(byId("Rs")?.value),0,1),
+    sigma: clamp(safeNum(byId("sigma")?.value),0,1)
   };
 }
 
@@ -109,7 +112,12 @@ let chart=null;
 
 function initChart(){
   const canvas = byId("chart");
-  if (!canvas || typeof Chart === "undefined") return;
+  const fallback = byId("chartFallback");
+
+  if (!canvas || typeof Chart === "undefined") {
+    if (fallback) fallback.style.display="block";
+    return;
+  }
 
   const ctx = canvas.getContext("2d");
 
@@ -125,14 +133,17 @@ function update(){
   updateDisplay(i);
 
   const Ad=calculate(i.Cs,i.Co,i.Io,i.Rs,i.sigma);
-  byId("result").textContent="Ad = "+Ad.toFixed(4);
+
+  const result = byId("result");
+  if(result) result.textContent="Ad = "+Ad.toFixed(4);
 
   if(!chart)return;
 
   const labels=[],data=[];
-  for(let s=0;s<=1;s+=0.05){
-    labels.push(s.toFixed(2));
-    data.push(calculate(i.Cs,i.Co,i.Io,i.Rs,s));
+  for(let s=0;s<=1.0001;s+=0.05){
+    const v = Number(s.toFixed(2));
+    labels.push(v.toFixed(2));
+    data.push(Number(calculate(i.Cs,i.Co,i.Io,i.Rs,v).toFixed(6)));
   }
 
   chart.data.labels=labels;
@@ -168,10 +179,13 @@ async function runBackend(){
 
     const d=await res.json();
 
-    byId("result").innerHTML=
-      "Score: "+d.score+"<br>"+
-      "Rank: "+d.rank+"<br>"+
-      d.interpretation;
+    const result = byId("result");
+    if(result){
+      result.innerHTML =
+        "Score: "+d.score+"<br>"+
+        "Rank: "+d.rank+"<br>"+
+        d.interpretation;
+    }
 
   }catch{
     alert("Simulation Failed");
@@ -183,7 +197,10 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   ["Cs","Co","Io","Rs","sigma"].forEach(id=>{
     const el = byId(id);
-    if (el) el.addEventListener("input",update);
+    if (el){
+      el.addEventListener("input",update);
+      el.addEventListener("change",update);
+    }
   });
 
   const btn = byId("runSim");
