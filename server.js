@@ -1,8 +1,3 @@
-/* =========================================
-   OMNIVERSE™ FINAL CORE — v1.1 LOCKED
-   Production Hardened Edition
-========================================= */
-
 import express from "express";
 import dotenv from "dotenv";
 import pkg from "pg";
@@ -18,10 +13,10 @@ dotenv.config();
 const app = express();
 const { Pool } = pkg;
 
+// Safe fetch
 const fetch = globalThis.fetch || (await import("node-fetch")).default;
 
-/* ---------------- ENV SAFETY ---------------- */
-
+// ENV validation
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET missing");
 if (process.env.JWT_SECRET.length < 32) throw new Error("JWT_SECRET too weak");
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL missing");
@@ -30,52 +25,44 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
 const API_KEY = process.env.OPENAI_API_KEY;
 const NODE_ENV = process.env.NODE_ENV || "development";
-
 const MODEL = process.env.AI_MODEL || "gpt-5-mini";
 
-/* ---------------- DATABASE ---------------- */
-
+// PostgreSQL (hardened)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: NODE_ENV === "production"
-    ? { rejectUnauthorized: false }
-    : false
+  ssl: { rejectUnauthorized: false },
+  connectionTimeoutMillis: 5000
 });
 
-/* ---------------- REDIS ---------------- */
+pool.on("error", (err) => {
+  console.error("PG ERROR:", err.message);
+});
 
+// Redis (optional, safe fallback)
 let redis = null;
 
 if (process.env.REDIS_URL) {
-  redis = new Redis(process.env.REDIS_URL, {
-    maxRetriesPerRequest: 2,
-    enableReadyCheck: false,
-    retryStrategy: (times) => Math.min(times * 50, 2000)
-  });
+  try {
+    redis = new Redis(process.env.REDIS_URL);
+    redis.on("error", (err) => {
+      if (NODE_ENV !== "production") console.warn("Redis:", err.message);
+    });
+  } catch {}
 }
 
-/* ---------------- APP SECURITY ---------------- */
-
+// Middleware
 app.set("trust proxy", 1);
 app.use(express.json({ limit: "1mb" }));
 
 app.use(
   helmet({
-    contentSecurityPolicy: {
-      useDefaults: true,
-      directives: {
-        "default-src": ["'self'"],
-        "script-src": ["'self'", "https://cdn.jsdelivr.net"],
-        "style-src": ["'self'", "'unsafe-inline'"],
-        "img-src": ["'self'", "data:", "https:"]
-      }
-    },
+    contentSecurityPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" }
   })
 );
 
 app.use(cors({
-  origin: "*"
+  origin: process.env.CORS_ORIGIN || "*"
 }));
 
 app.use(rateLimit({
@@ -83,8 +70,7 @@ app.use(rateLimit({
   max: NODE_ENV === "production" ? 150 : 100
 }));
 
-/* ---------------- HELPERS ---------------- */
-
+// Utils
 const createError = (status, msg) => {
   const err = new Error(msg);
   err.status = status;
@@ -94,22 +80,22 @@ const createError = (status, msg) => {
 const asyncHandler = fn => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
-/* ---------------- AUTH MIDDLEWARE ---------------- */
-
+// Auth (HARDENED)
 const auth = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ error: "UNAUTHORIZED" });
 
   try {
-    req.user = jwt.verify(token, JWT_SECRET);
+    req.user = jwt.verify(token, JWT_SECRET, {
+      algorithms: ["HS256"]
+    });
     next();
   } catch {
     return res.status(403).json({ error: "INVALID_TOKEN" });
   }
 };
 
-/* ---------------- RANKING ENGINE ---------------- */
-
+// Rank
 function getRank(score) {
   if (score >= 0.9) return "AAA";
   if (score >= 0.8) return "AA+";
@@ -118,7 +104,7 @@ function getRank(score) {
   return "BBB";
 }
 
-/* ---------------- AUTH ROUTES ---------------- */
+// ================= AUTH =================
 
 app.post("/auth/register", asyncHandler(async (req, res) => {
   const { email, password, name } = req.body;
@@ -177,6 +163,8 @@ app.post("/auth/login", asyncHandler(async (req, res) => {
     [user.rows[0].id]
   );
 
+  if (!org.rows.length) throw createError(500, "ORG_NOT_FOUND");
+
   const token = jwt.sign(
     { userId: user.rows[0].id, orgId: org.rows[0].org_id },
     JWT_SECRET,
@@ -186,13 +174,13 @@ app.post("/auth/login", asyncHandler(async (req, res) => {
   res.json({ token });
 }));
 
-/* ---------------- SCORE ENGINE ---------------- */
+// ================= DATA =================
 
 async function fetchWorldBank() {
-  const url =
-    "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.CD?format=json&per_page=20000";
+  const res = await fetch(
+    "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.CD?format=json&per_page=20000"
+  );
 
-  const res = await fetch(url);
   if (!res.ok) throw createError(500, "WB_API_FAIL");
 
   const data = await res.json();
@@ -201,14 +189,17 @@ async function fetchWorldBank() {
 
 const computeScore = d => Math.log1p(d.value) / 10;
 
-app.get("/score/all", auth, asyncHandler(async (req, res) => {
+// ================= SCORE =================
 
+app.get("/score/all", auth, asyncHandler(async (req, res) => {
   const cacheKey = `scores:${req.user.orgId}`;
 
-  if (redis) {
-    const cached = await redis.get(cacheKey);
-    if (cached) return res.json(JSON.parse(cached));
-  }
+  try {
+    if (redis) {
+      const cached = await redis.get(cacheKey);
+      if (cached) return res.json(JSON.parse(cached));
+    }
+  } catch {}
 
   const data = await fetchWorldBank();
   const client = await pool.connect();
@@ -243,9 +234,14 @@ app.get("/score/all", auth, asyncHandler(async (req, res) => {
 
     await client.query("COMMIT");
 
-    if (redis) {
-      await redis.set(cacheKey, JSON.stringify(scores), "EX", 60);
-    }
+    // Sort (final polish)
+    scores.sort((a, b) => b.score - a.score);
+
+    try {
+      if (redis) {
+        await redis.set(cacheKey, JSON.stringify(scores), "EX", 60);
+      }
+    } catch {}
 
     res.json(scores);
 
@@ -257,28 +253,45 @@ app.get("/score/all", auth, asyncHandler(async (req, res) => {
   }
 }));
 
-/* ---------------- AI ROUTE ---------------- */
+// ================= AI =================
 
 app.post("/ai", auth, asyncHandler(async (req, res) => {
-
   if (!API_KEY) throw createError(500, "AI_NOT_CONFIGURED");
 
   const input = JSON.stringify(req.body);
   if (input.length > 2000) throw createError(400, "INPUT_TOO_LARGE");
 
-  const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      input
-    })
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
 
-  if (!response.ok) throw createError(500, "AI_API_FAIL");
+  let response;
+
+  try {
+    response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        input
+      }),
+      signal: controller.signal
+    });
+  } catch (err) {
+    if (err.name === "AbortError") {
+      throw createError(504, "AI_TIMEOUT");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw createError(500, `AI_API_FAIL: ${errText}`);
+  }
 
   const data = await response.json();
 
@@ -291,37 +304,32 @@ app.post("/ai", auth, asyncHandler(async (req, res) => {
   res.json(data);
 }));
 
-/* ---------------- HEALTH ---------------- */
+// ================= HEALTH =================
 
 app.get("/health", (req, res) => {
   res.json({
     status: "OK",
     uptime: process.uptime(),
-    memory: process.memoryUsage(),
     redis: !!redis
   });
 });
 
-/* ---------------- ERROR HANDLER ---------------- */
+// ================= ERROR =================
 
 app.use((err, req, res, next) => {
-  if (NODE_ENV !== "production") {
-    console.error(err);
-  }
-
+  if (NODE_ENV !== "production") console.error(err);
   res.status(err.status || 500).json({
     error: err.message || "SERVER_ERROR"
   });
 });
 
-/* ---------------- SERVER ---------------- */
+// ================= START =================
 
 const server = app.listen(PORT, () => {
-  console.log(`OMNIVERSE™ v1.1 LOCKED running on ${PORT}`);
+  console.log(`running on ${PORT}`);
 });
 
-/* ---------------- GRACEFUL SHUTDOWN ---------------- */
-
+// Graceful shutdown
 const shutdown = async () => {
   try {
     await pool.end();
@@ -329,7 +337,6 @@ const shutdown = async () => {
   } catch {}
 
   server.close(() => process.exit(0));
-
   setTimeout(() => process.exit(1), 5000);
 };
 
