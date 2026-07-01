@@ -1,146 +1,183 @@
-# 🌐 OMNIVERSE™  
-## Sovereign Decision Intelligence Standard  
+# 🌐 OMNIVERSE™ v2.0
+## Global Decision Sovereignty & Strategic Intelligence Framework
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19430636.svg)](https://doi.org/10.5281/zenodo.19430636)  
-![Status](https://img.shields.io/badge/Status-Active-blue)  
-![License](https://img.shields.io/badge/License-Proprietary-red)  
-![AI](https://img.shields.io/badge/AI-Decision%20Intelligence-purple)  
-![Governance](https://img.shields.io/badge/Governance-Global-green)  
-
----
-
-## 📖 Executive Summary  
-
-OMNIVERSE™ is a mathematically formalized, sovereign-neutral global decision intelligence standard designed to evaluate, optimize, and certify decision systems across governance, artificial intelligence, and multi-agent environments.  
-
-It is a deployment-grade computational platform integrating:  
-
-- Deterministic decision modeling  
-- Real-time analytical evaluation  
-- API-driven intelligence outputs  
-- Interactive dashboard visualization  
-- Reproducible and auditable architecture  
-
-OMNIVERSE™ establishes a unified decision sovereignty layer across national, institutional, and global systems.  
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21105000.svg)](https://doi.org/10.5281/zenodo.21105000)
+[![Concept DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19430635.svg)](https://doi.org/10.5281/zenodo.19430635)
+![Status](https://img.shields.io/badge/Status-Active-success)
+![License](https://img.shields.io/badge/License-Proprietary-blue)
+![Version](https://img.shields.io/badge/Version-2.0-orange)
+![AI](https://img.shields.io/badge/AI-Governance-purple)
 
 ---
 
-## 🌐 Live System Access  
+# 📖 Executive Summary
 
-- Website: https://bidyutmazumdar.github.io/omniverse-global-decision-standard/  
-- Dashboard: https://bidyutmazumdar.github.io/omniverse-global-decision-standard/dashboard.html  
-- AI Engine: https://bidyutmazumdar.github.io/omniverse-global-decision-standard/ai.html  
-- Simulator: https://bidyutmazumdar.github.io/omniverse-global-decision-standard/simulator.html  
-- API (Local): http://localhost:3000  
+**OMNIVERSE™ v2.0** is a reproducible computational framework for harmonized country-level analysis, decision intelligence, and strategic evaluation.
 
----
+The framework integrates heterogeneous datasets into a unified analytical environment to support:
 
-## 🧩 Architecture Diagram  
+- Deterministic computational workflows
+- Harmonized country-level datasets
+- Composite analytical indices
+- Comparative global rankings
+- Metadata generation
+- Provenance documentation
+- Integrity verification
+- Publication-ready archival outputs
+- Reproducible computational research
 
-## 🌐 OMNIVERSE™ System Architecture  
-
-![OMNIVERSE™ System Architecture](./OMNIVERSE_Global_Architecture.png)  
-
-**Figure 1: OMNIVERSE™ System Architecture**  
-
-OMNIVERSE™ integrates governance architecture (**O.M.N.I.A.R.C.H™**) with an execution layer (**AEON™**) to enable real-time simulation, validation, and strategic intelligence outputs.  
+Version 2.0 extends the original framework with improved publication workflows, metadata generation, integrity verification, reproducibility support, and long-term archival documentation.
 
 ---
 
-## 🏗️ Core Architecture  
+# 🌐 Live System
 
-### 🔷 OMNIVERSE™ Standard  
-Global sovereign decision intelligence layer  
+**Website**
 
-### 🔷 O.M.N.I.A.R.C.H™  
-Governance architecture defining structural logic and policy alignment  
+https://bidyutmazumdar.github.io/omniverse-global-decision-standard/
 
-### 🔷 AEON™ Execution Layer  
-- Simulation  
-- Forecasting  
-- Scenario Engine  
+**Dashboard**
+
+https://bidyutmazumdar.github.io/omniverse-global-decision-standard/dashboard.html
+
+**AI Interface**
+
+https://bidyutmazumdar.github.io/omniverse-global-decision-standard/ai.html
+
+**Simulator**
+
+https://bidyutmazumdar.github.io/omniverse-global-decision-standard/simulator.html
 
 ---
 
-## 🔄 System Pipeline  
+# 🧩 System Architecture
 
 ```
-User Interface  
-   ↓  
-API Layer (RESTful Endpoints)  
-   ↓  
-Data Layer (Global Datasets)  
-   ↓  
-Decision Engine (Analytical Core)  
-   ↓  
-Validation Logic (Traceability + Robustness)  
-   ↓  
-Output Interface (Scoring & Reports)  
+                OMNIVERSE™
+                     │
+     ┌───────────────┼───────────────┐
+     │                               │
+O.M.N.I.A.R.C.H™              AEON™ Engine
+Governance Layer          Execution & Analytics
+     │                               │
+     └───────────────┬───────────────┘
+                     │
+             Decision Intelligence
+                     │
+           Validation & Traceability
+                     │
+             Reports & Visualizations
 ```
 
 ---
 
-## ⚙️ Key Capabilities  
+# 🔄 Computational Workflow
 
-- 🌍 Real-time global intelligence  
-- 🤖 AI-driven simulation and forecasting  
-- 📊 Multi-dimensional scoring systems  
-- 🔍 Validation, traceability, and robustness  
-- 🧠 Decision support for governments & enterprises  
-
----
-
-## 🌍 Data Sources  
-
-OMNIVERSE™ integrates real-world global datasets:  
-
-- World Bank API (GDP, infrastructure, macro indicators)  
-- UN / UNDP (Human Development Index)  
-- ITU (Cybersecurity & digital resilience metrics)  
-
-All datasets are normalized into a unified [0–1] decision scale.  
-
----
-
-## 🌐 Global Alignment  
-
-Aligned with international institutional frameworks:  
-
-- World Bank  
-- United Nations (UN / UNDP)  
-- ITU  
-- OECD  
-- Oxford Insights  
-
----
-
-## 📊 Outputs  
-
-- Real-time intelligence outputs  
-- Global scoring & rankings  
-- Simulation dashboards  
-- AI evaluation reports  
+```
+Datasets
+      │
+      ▼
+Dataset Inventory
+      │
+      ▼
+Country Harmonization
+      │
+      ▼
+Master Dataset Construction
+      │
+      ▼
+Data Quality Assessment
+      │
+      ▼
+Composite Index Generation
+      │
+      ▼
+Comparative Ranking
+      │
+      ▼
+Metadata Generation
+      │
+      ▼
+Integrity Verification
+      │
+      ▼
+Publication Package
+```
 
 ---
 
-## 🧪 Use Cases  
+# ⚙️ Core Capabilities
 
-- National policy simulation  
-- Economic forecasting  
-- Infrastructure planning  
-- Climate strategy modeling  
-- AI governance systems  
+- Harmonized global datasets
+- Country normalization
+- Composite index generation
+- Comparative ranking
+- Metadata catalog generation
+- Provenance documentation
+- SHA-256 integrity verification
+- Reproducible publication workflow
+- Archival-ready research outputs
 
 ---
 
-## 🧮 Mathematical Foundation  
+# 🌍 Data Sources
+
+The framework supports integration of internationally available datasets, including sources such as:
+
+- World Bank
+- United Nations (UN)
+- UNDP
+- OECD
+- Oxford Insights
+- ITU
+
+Additional datasets may be incorporated through documented harmonization workflows.
+
+---
+
+# 📊 Research Outputs
+
+Version 2.0 generates:
+
+- Harmonized master datasets
+- Country harmonization tables
+- Composite analytical indices
+- Global rankings
+- Public release datasets
+- Metadata catalog
+- Data dictionary
+- File manifests
+- Integrity checksums
+- Publication metadata
+- Reproducibility documentation
+- Provenance records
+
+---
+
+# 🧪 Applications
+
+Potential applications include:
+
+- Computational social science
+- Comparative governance research
+- Public policy analysis
+- Decision intelligence
+- AI governance research
+- Data science
+- Strategic analysis
+- Educational use
+- Reproducibility studies
+
+---
+
+# 🧮 Mathematical Foundation
 
 ```
 D = f(I, A, R, C, T)
 
 Ds = (I × A × C) / (R × σt)
 
-Io = ∑(wᵢ × Xᵢₙ)
+Io = Σ(wᵢ × Xᵢₙ)
 
 Cs = Io × Rs × AGAPₙ × e^(−σt)
 
@@ -149,58 +186,97 @@ Ad = (Cs × Co × Io × Rs) × e^(−σt)
 
 ---
 
-## 🔌 API Surface  
+# 🔌 API Overview
 
-| Endpoint         | Type | Description                  |
-|----------------|------|------------------------------|
-| /              | GET  | System status                |
-| /ai            | POST | AI decision evaluation       |
-| /data/combined | GET  | Unified dataset              |
-| /score/all     | GET  | Global scoring output        |
-| /score/top     | GET  | Top ranked systems           |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| / | GET | System status |
+| /ai | POST | Decision evaluation |
+| /data/combined | GET | Unified dataset |
+| /score/all | GET | Global scoring |
+| /score/top | GET | Top-ranked outputs |
 
-**Example:**
-```
+Example:
+
+```bash
 curl http://localhost:3000/score/all
 ```
 
 ---
 
-## 📚 Citation  
+# 📚 Citation
 
-```
-Mazumdar, B. (2026).  
-OMNIVERSE™ — Global Decision Sovereignty & Strategic Intelligence Standard (v1.0).  
-Zenodo. https://doi.org/10.5281/zenodo.19430636
-```
+**Version DOI**
 
----
+https://doi.org/10.5281/zenodo.21105000
 
-## 🧾 Author  
+**Concept DOI**
 
-Dr. B. Mazumdar, D.Sc. (Hon.), D.Litt. (Hon.)  
-Architect of Modern Statehood  
-Founder & Principal Architect, FAIR+D Canon™  
+https://doi.org/10.5281/zenodo.19430635
 
-ORCID: https://orcid.org/0009-0007-5615-3558  
+Citation:
+
+> Mazumdar, B. (2026). *OMNIVERSE™ v2.0 — Global Decision Sovereignty & Strategic Intelligence Framework (Version 2.0).* Zenodo. https://doi.org/10.5281/zenodo.21105000
 
 ---
 
-## ⚖️ License  
+# 👤 Author
 
-Proprietary License  
-All rights reserved  
-No commercial use without permission  
-No derivative redistribution  
+**Bidyut Mazumdar**
+
+Independent Research Scholar
+
+Founder, **FAIR+D Canon™**
+
+ORCID
+
+https://orcid.org/0009-0007-5615-3558
+
+---
+
+# 📦 Repository Contents
+
+- Source Code
+- Computational Workflows
+- Harmonized Datasets
+- Publication Metadata
+- Documentation
+- Jupyter Notebook
+- Release Manifests
+- Checksums
+- CITATION.cff
+- License
+- Environment Configuration
 
 ---
 
-## 🚀 Vision  
+# ⚖️ License
 
-OMNIVERSE™ aims to establish a universal standard for decision intelligence, bridging AI, governance, and global systems into a single interoperable framework.  
+OMNIVERSE™ Proprietary Non-Commercial License v1.0
+
+Permitted:
+
+- Academic research
+- Educational use
+- Scholarly citation
+- Non-commercial verification
+
+Commercial use requires prior written permission from the copyright holder.
 
 ---
 
-> “From data to decision — from simulation to sovereignty.”  
+# 🚀 Version 2 Highlights
+
+- Improved computational workflow
+- Enhanced metadata generation
+- Publication-quality archival package
+- Reproducibility documentation
+- Integrity verification
+- Release fingerprint
+- GitHub source package
+- Zenodo archival release
+- Long-term digital preservation support
 
 ---
+
+*"Supporting transparent, reproducible, and computationally documented research for decision intelligence and harmonized global analysis."*
